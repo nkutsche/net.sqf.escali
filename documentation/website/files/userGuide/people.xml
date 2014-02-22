@@ -1,0 +1,12 @@
+<people>
+    <person>
+        <name>Nico Kutscherauer</name>
+        <dateOfBirth>1986-04-05</dateOfBirth>
+        <age>23</age>
+    </person>
+    <person>
+        <name>Niamh Kutscherauer</name>
+        <dateOfBirth>2007-08-18</dateOfBirth>
+        <age>5</age>
+    </person>
+</people>

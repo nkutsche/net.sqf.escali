@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/calabash/calabash.jar"/>
+	<classpathentry kind="lib" path="lib/calabash/lib/commons-codec-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/calabash/lib/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/calabash/lib/commons-io-1.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/calabash/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/calabash/lib/saxon9he.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sqf.xmlUtils"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

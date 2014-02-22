@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+    <head>
+        <?sqfc-start replace-d11e5?><title>forbidden comment</title><?sqfc-end replace-d11e5?>
+    </head>
+    <body>
+        <h1>Usefull and short title</h1>
+        <!-- Content -->
+    </body>
+</html>
