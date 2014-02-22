@@ -1,0 +1,901 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml"><?sqf-processed 02_makeMenu.xsl?>
+   <head subMenuLevel="3">
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta name="robots" content="noindex,follow" />
+      <link href="../files/css/sqf.css" rel="stylesheet" type="text/css" />
+      <link href="../images/sqf-logo-tiny.ico" rel="icon" type="image/x-icon" />
+      <link href="../images/sqf-logo-tiny.ico" rel="shortcut icon" type="image/x-icon" />
+      <title>Schematron QuickFix – User Guide</title>
+   </head>
+   <body>
+      <div class="menu"><a href="../index.html">
+            <div id="logo"></div></a><div class="menu-links">
+            <div class="menu-button" abs-uri="http://www.schematron-quickfix.de/index.html" uri="http://www.schematron-quickfix.de/quickFix/guide.html"><a class="menu" href="../index.html">Home</a></div>
+            <div class="menu-button" abs-uri="http://www.schematron-quickfix.de/concept.html" uri="http://www.schematron-quickfix.de/quickFix/guide.html"><a class="menu" href="../concept.html">Concept</a></div>
+            <div class="menu-button-parent" abs-uri="http://www.schematron-quickfix.de/quickFix.html" uri="http://www.schematron-quickfix.de/quickFix/guide.html"><a class="menu-parent" href="../quickFix.html">QuickFix</a></div>
+            
+            
+            
+            
+            <div class="menu-button" abs-uri="http://www.schematron-quickfix.de/about.html" uri="http://www.schematron-quickfix.de/quickFix/guide.html"><a class="menu" href="../about.html">About</a></div>
+         </div>
+      </div>
+      <div class="sub-menu">
+         <div class="sub-menu-links">
+            <div class="menu-button-self" abs-uri="http://www.schematron-quickfix.de/quickFix/guide.html" uri="http://www.schematron-quickfix.de/quickFix/guide.html"><a class="menu-self" href="guide.html">User Guide</a></div>
+            <div class="menu-l3">
+               <div class="menu-button"><a class="menu" href="#sqf:d113e12">Example</a></div>
+            </div>
+            <div class="menu-l3">
+               <div class="menu-button"><a class="menu" href="#sqf:d113e35">Define QuickFixes</a></div>
+            </div>
+            <div class="menu-l3">
+               <div class="menu-button"><a class="menu" href="#sqf:d113e61">The QuickFix namespace</a></div>
+            </div>
+            <div class="menu-l3">
+               <div class="menu-button"><a class="menu" href="#sqf:d113e67">Connect QuickFix and assert</a></div>
+            </div>
+            <div class="menu-l3">
+               <div class="menu-button"><a class="menu" href="#sqf:d113e116">Define a description</a></div>
+            </div>
+            <div class="menu-l3">
+               <div class="menu-button"><a class="menu" href="#sqf:d113e124">Activity elements</a></div>
+            </div>
+            <div class="menu-l3">
+               <div class="menu-button"><a class="menu" href="#sqf:d113e393">Parameters</a></div>
+            </div>
+            <div class="menu-l3">
+               <div class="menu-button"><a class="menu" href="#sqf:d113e442">Define an user entry</a></div>
+            </div>
+            <div class="menu-button" abs-uri="http://www.schematron-quickfix.de/quickFix/reference.html" uri="http://www.schematron-quickfix.de/quickFix/guide.html"><a class="menu" href="reference.html">Extension references</a></div>
+         </div>
+      </div>
+      
+      <div class="body">
+         <div class="deco-hor"></div>
+         <div class="deco-ver"></div>
+         <div class="deco-body"></div>
+         <h1>How to write a Schematron schema with QuickFixes</h1>
+         <p>This page demonstrates with an example how to extend a Schematron schema by using QuickFixes. You should be able to read Schematron
+            schemas and to read and write XPath in order to follow the examples.
+         </p>
+         <div id="sqf:d113e12" class="section">
+            <h2>Example</h2>
+            <p>This is an abstract example. It shows a list of persons who should be of age. Also the date of birth should fit with the age.
+               This is the XML instance:
+            </p>
+            <div class="code" href="../files/userGuide/people.xml">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">1</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element" status="element">&lt;people&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">2</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;person&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">3</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element" status="element">&lt;name&gt;</span><span class="none" status="none">Nico Kutscherauer</span><span class="element" status="element">&lt;/name&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">4</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element" status="element">&lt;dateOfBirth&gt;</span><span class="none" status="none">1986-04-05</span><span class="element" status="element">&lt;/dateOfBirth&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">5</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element" status="element">&lt;age&gt;</span><span class="none" status="none">23</span><span class="element" status="element">&lt;/age&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">6</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;/person&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">7</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;person&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">8</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element" status="element">&lt;name&gt;</span><span class="none" status="none">Niamh Kutscherauer</span><span class="element" status="element">&lt;/name&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">9</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element" status="element">&lt;dateOfBirth&gt;</span><span class="none" status="none">2007-08-18</span><span class="element" status="element">&lt;/dateOfBirth&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">10</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element" status="element">&lt;age&gt;</span><span class="none" status="none">5</span><span class="element" status="element">&lt;/age&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">11</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;/person&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">12</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element" status="element">&lt;/people&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people.xml" target="_blank">to source.</a></div>
+            <p>The first person is of age, but the age does not match the date of birth. The second person is too young.</p>
+            <p>The following Schematron schema tests these errors:</p>
+            <div class="code" href="../files/userGuide/people.sch">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">1</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element" status="element">&lt;schema</span><span class="attribute" status="attribute"> xmlns=</span><span class="attributeValue" status="attributeValue">"http://purl.oclc.org/dsdl/schematron"</span><span class="attribute" status="attribute"> queryBinding=</span><span class="attributeValue" status="attributeValue">"xslt2"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">2</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;title&gt;</span><span class="none" status="none">People &amp;#x2013; test</span><span class="element" status="element">&lt;/title&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">3</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;pattern&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">4</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element" status="element">&lt;rule</span><span class="attribute" status="attribute"> context=</span><span class="attributeValue" status="attributeValue">"person"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">5</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="element" status="element">&lt;let</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"currYear"</span><span class="attribute" status="attribute"> value=</span><span class="attributeValue" status="attributeValue">"year-from-date(current-date())"</span><span class="element" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">6</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="element" status="element">&lt;let</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"maxBirth"</span><span class="attribute" status="attribute"> value=</span><span class="attributeValue" status="attributeValue">"replace(string(current-date()),</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">7</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="attributeValue" status="attributeValue">                                                string($currYear), </span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">8</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="attributeValue" status="attributeValue">                                                string($currYear - age - 1))"</span><span class="element" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">9</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="element" status="element">&lt;let</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"minBirth"</span><span class="attribute" status="attribute"> value=</span><span class="attributeValue" status="attributeValue">"replace(string(current-date()),string($currYear), string($currYear - age))"</span><span class="element" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">10</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="element" status="element">&lt;let</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"birth"</span><span class="attribute" status="attribute"> value=</span><span class="attributeValue" status="attributeValue">"xs:date(dateOfBirth)"</span><span class="element" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">11</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="element" status="element">&lt;assert</span><span class="attribute" status="attribute"> test=</span><span class="attributeValue" status="attributeValue">"$birth gt xs:date($maxBirth) and $birth le xs:date($minBirth)"</span><span class="element" status="element">&gt;</span><span class="element" status="element">&lt;value-of</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"name"</span><span class="element" status="element">/&gt;</span><span class="none" status="none"> is not </span><span class="element" status="element">&lt;value-of</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"age"</span><span class="element" status="element">/&gt;</span><span class="none" status="none"> years old or is not born on </span><span class="element" status="element">&lt;value-of</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"dateOfBirth"</span><span class="element" status="element">/&gt;</span><span class="none" status="none">.</span><span class="element" status="element">&lt;/assert&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">12</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="element" status="element">&lt;assert</span><span class="attribute" status="attribute"> test=</span><span class="attributeValue" status="attributeValue">"not($birth gt xs:date($maxBirth) and $birth le xs:date($minBirth)) or number(age) ge 18"</span><span class="element" status="element">&gt;</span><span class="element" status="element">&lt;value-of</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"name"</span><span class="element" status="element">/&gt;</span><span class="none" status="none"> is too young.</span><span class="element" status="element">&lt;/assert&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">13</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element" status="element">&lt;/rule&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">14</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;/pattern&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">15</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element" status="element">&lt;/schema&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people.sch" target="_blank">to source.</a></div>
+            <p><b>Note:</b> For this example, we ignore the error which occurs if the current-date is February 29.
+            </p>
+            <p>These should be the error messages:</p>
+            <p><span class="icode-none">Nico Kutscherauer is not 23 years old or is not born on 1986-04-05.</span></p>
+            <p><span class="icode-none">Niamh Kutscherauer is too young.</span></p>
+         </div>
+         <div class="uplink"><a href="#">top</a></div>
+         <div id="sqf:d113e35" class="section">
+            <h2 navTitle="Define QuickFixes">Step 1: Defining fixes</h2>
+            <p>The first step is to think about possible solutions for these problems. The first error could have the following fixes:</p>
+            <ul>
+               <li>
+                  <p>The age is incorrect. Calculate the correct age from the date of birth.</p>
+               </li>
+               <li>
+                  <p>The age is correct, but the year of birth is incorrect. Calculate the correct year of birth from the age and replace the year
+                     in the present date of birth.
+                  </p>
+               </li>
+               <li>
+                  <p>The date of birth is completly wrong. You need to enter the correct date.</p>
+               </li>
+            </ul>
+            <p>Fixes for the second error:</p>
+            <ul>
+               <li>
+                  <p>The person is indeed too young. Delete it from the list.</p>
+               </li>
+               <li>
+                  <p>The age and the date of birth are wrong. Enter the correct date of birth.</p>
+               </li>
+            </ul>
+            <p>There could also be other fixes for these problems.</p>
+         </div>
+         <div class="uplink"><a href="#">top</a></div>
+         <div id="sqf:d113e61" class="section">
+            <h2 navTitle="The QuickFix namespace">Step 2: Adding the QuickFix namespace</h2>
+            <p>You need the correct namespace of the Schematron QuickFix:</p>
+            <div class="code" href="../files/userGuide/people2.sch" line="2">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">2</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element" status="element">&lt;schema</span><span class="attribute" status="attribute"> xmlns=</span><span class="attributeValue" status="attributeValue">"http://purl.oclc.org/dsdl/schematron"</span><span class="attribute" status="attribute"> queryBinding=</span><span class="attributeValue" status="attributeValue">"xslt2"</span><span class="attribute" status="attribute"> xmlns:sqf=</span><span class="attributeValue" status="attributeValue">"http://www.schematron-quickfix.com/validator/process"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people2.sch" target="_blank">to source.</a></div>
+         </div>
+         <div class="uplink"><a href="#">top</a></div>
+         <div id="sqf:d113e67" class="section">
+            <h2 navTitle="Connect QuickFix and assert">Step 3: Adding a QuickFix to an <span class="icode-element">&lt;assert&gt;</span> element
+            </h2>
+            <p>Firstly, you need a <span class="icode-element-sqf">&lt;sqf:fix&gt;</span> element to add a QuickFix to an <span class="icode-element">&lt;assert&gt;</span> element. You can add it to the same rule or you can put all fixes in a top-level <span class="icode-element-sqf">&lt;sqf:fixes&gt;</span> element. The <span class="icode-element-sqf">&lt;sqf:fix&gt;</span> element requires an <span class="icode-attribute">id</span> attribute with the ID of the QuickFix.
+            </p>
+            <p>Secondly, you have to connect the <span class="icode-element">&lt;assert&gt;</span> with the QuickFix. For this, you add a <span class="icode-attribute-sqf">sqf:fix</span> attribute to the <span class="icode-element">&lt;assert&gt;</span> and set the value to the ID of the QuickFix.
+            </p>
+            <div class="code" href="../files/userGuide/people3.sch" line="10,12-14">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">10</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element" status="element">&lt;assert</span><span class="attribute" status="attribute"> test=</span><span class="attributeValue" status="attributeValue">"$birth gt xs:date($maxBirth) and $birth le xs:date($minBirth)"</span><span class="attribute" status="attribute"> sqf:fix=</span><span class="attributeValue" status="attributeValue">"setAge"</span><span class="element" status="element">&gt;</span><span class="element" status="element">&lt;value-of</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"name"</span><span class="element" status="element">/&gt;</span><span class="none" status="none"> is not </span><span class="element" status="element">&lt;value-of</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"age"</span><span class="element" status="element">/&gt;</span><span class="none" status="none"> years old or is not born on </span><span class="element" status="element">&lt;value-of</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"dateOfBirth"</span><span class="element" status="element">/&gt;</span><span class="none" status="none">.</span><span class="element" status="element">&lt;/assert&gt;</span></td>
+                     </tr>
+                     <tr class="code-line">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">  </span></td>
+                        <td class="line"><span class="skip" style="margin-left:2em;">[...]</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">12</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"setAge"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">  </span></td>
+                        <td class="line"><span class="skip" style="margin-left:2em;">[...]</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">14</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people3.sch" target="_blank">to source.</a></div>
+            <p>In order to connect an <span class="icode-element">&lt;assert&gt;</span> with more than one QuickFix, you can separate the IDs in the <span class="icode-attribute-sqf">sqf:fix</span> attribute of all QuickFixes with space characters.
+            </p>
+            <div class="code" href="../files/userGuide/people3.sch" line="11,15-20">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">11</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element" status="element">&lt;assert</span><span class="attribute" status="attribute"> test=</span><span class="attributeValue" status="attributeValue">"not($birth gt xs:date($maxBirth) and $birth le xs:date($minBirth)) or number(age) ge 18"</span><span class="attribute" status="attribute"> sqf:fix=</span><span class="attributeValue" status="attributeValue">"delete birthEntry"</span><span class="element" status="element">&gt;</span><span class="element" status="element">&lt;value-of</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"name"</span><span class="element" status="element">/&gt;</span><span class="none" status="none"> is too young.</span><span class="element" status="element">&lt;/assert&gt;</span></td>
+                     </tr>
+                     <tr class="code-line">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">  </span></td>
+                        <td class="line"><span class="skip" style="margin-left:2em;">[...]</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">15</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"delete"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">  </span></td>
+                        <td class="line"><span class="skip" style="margin-left:2em;">[...]</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">17</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">18</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"birthEntry"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">  </span></td>
+                        <td class="line"><span class="skip" style="margin-left:2em;">[...]</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">20</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people3.sch" target="_blank">to source.</a></div>
+            <p>Now you have successfully connected your <span class="icode-element">&lt;assert&gt;</span> elements with QuickFixes, but they don't do anything yet.
+            </p>
+         </div>
+         <div class="uplink"><a href="#">top</a></div>
+         <div id="sqf:d113e116" class="section">
+            <h2 navTitle="Define a description">Step 4: Defining a description for a QuickFix.</h2>
+            <p>The user wants to know what happens if he chooses your QuickFix. Therefore, the QuickFix requires a description which is human-readable.
+               The following example shows how it works:
+            </p>
+            <div class="code" href="../files/userGuide/people4.sch" line="12-26">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">12</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"setAge"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">13</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">14</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element-sqf" status="element">&lt;sqf:p&gt;</span><span class="none" status="none">Calculate the age from the date of birth.</span><span class="element-sqf" status="element">&lt;/sqf:p&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">15</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;/sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">16</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">17</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"delete"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">18</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">19</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element-sqf" status="element">&lt;sqf:p&gt;</span><span class="none" status="none">Delete the person from the list.</span><span class="element-sqf" status="element">&lt;/sqf:p&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">20</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;/sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">21</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">22</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"birthEntry"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">23</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">24</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element-sqf" status="element">&lt;sqf:p&gt;</span><span class="none" status="none">The age and the date of birth are wrong. Enter the correct date of birth.</span><span class="element-sqf" status="element">&lt;/sqf:p&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">25</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;/sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">26</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people4.sch" target="_blank">to source.</a></div>
+            <p>Now, your QuickFixes have human-readable labels, but they still don't do anything.</p>
+         </div>
+         <div class="uplink"><a href="#">top</a></div>
+         <div id="sqf:d113e124" class="section">
+            <h2 navTitle="Activity elements">Step 5: Activity elements</h2>
+            <p>In order to define an action for a QuickFix, it may contain one or several "activity elements".</p>
+            <p>Schematron QuickFix offers four "activity elements":</p>
+            <ul>
+               <li>
+                  <p><span class="icode-element-sqf">&lt;sqf:delete&gt;</span></p>
+               </li>
+               <li>
+                  <p><span class="icode-element-sqf">&lt;sqf:replace&gt;</span></p>
+               </li>
+               <li>
+                  <p><span class="icode-element-sqf">&lt;sqf:add&gt;</span></p>
+               </li>
+               <li>
+                  <p><span class="icode-element-sqf">&lt;sqf:stringReplace&gt;</span></p>
+               </li>
+            </ul>
+            <p>The easiest action is to delete one or more nodes. You just need to specify which nodes you want to delete. For the deletion
+               – surprise! – you need the <span class="icode-element-sqf">&lt;sqf:delete&gt;</span> element.
+            </p>
+            <div id="sqf:d113e153" class="section">
+               <h3>Step 5.1: Deleting</h3>
+               <p>In order to specify the nodes for the deletion, the <span class="icode-element-sqf">&lt;sqf:delete&gt;</span> element can have a <span class="icode-attribute">match</span> attribute. With a XPath expression you point at the nodes. The context of relative expressions is the context the Schematron
+                  rule has set. The default value of the <span class="icode-attribute">match</span> attribute is <span class="icode-attributeValue">self::*</span>. However, if you want to delete the context node of the rule, you only need the following:
+               </p>
+               <div class="code" href="../files/userGuide/people5.sch" line="26-31">
+                  <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                     <col />
+                     <col />
+                     <tbody>
+                        <tr class="code-line" level="0">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">26</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"delete"</span><span class="element" status="element">&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">27</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:description&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="2">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">28</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element-sqf" status="element">&lt;sqf:p&gt;</span><span class="none" status="none">Delete the person from the list.</span><span class="element-sqf" status="element">&lt;/sqf:p&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">29</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;/sqf:description&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">30</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:delete/&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="0">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">31</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+               <div class="code-ref"><a href="../files/userGuide/people5.sch" target="_blank">to source.</a></div>
+            </div>
+            <div id="sqf:d113e171" class="section">
+               <h3>Step 5.2: Replacing</h3>
+               <p>In order to replace elements, you need of course the <span class="icode-element-sqf">&lt;sqf:replace&gt;</span> element. Just like the <span class="icode-element-sqf">&lt;sqf:delete&gt;</span> element, the <span class="icode-element-sqf">&lt;sqf:replace&gt;</span> element can have a <span class="icode-attribute">match</span> attribute. If not, it replaces the context node of the rule.
+               </p>
+               <p>The <span class="icode-element-sqf">&lt;sqf:replace&gt;</span> element has three tasks. It identifies the elements to be replaced, defines the replacing element and the content of it.
+               </p>
+               <p>Other attributes:</p>
+               <ul>
+                  <li>
+                     <p><span class="liTitle"><span class="icode-attribute">node-type</span>:</span></p>
+                     <p>It determines the type of the replacing node. Allowed values are:</p>
+                     <p>
+                        <ul>
+                           <li>
+                              <p><span class="liTitle"><span class="icode-attributeValue">keep</span>:</span> keep the node type of the node to be replaced. It is also the default value.
+                              </p>
+                           </li>
+                           <li>
+                              <p><span class="liTitle"><span class="icode-attributeValue">element</span>:</span> creates an element.
+                              </p>
+                           </li>
+                           <li>
+                              <p><span class="liTitle"><span class="icode-attributeValue">attribute</span>:</span> creates an attribute.
+                              </p>
+                           </li>
+                           <li>
+                              <p><span class="liTitle"><span class="icode-attributeValue">comment</span>:</span> creates a comment.
+                              </p>
+                           </li>
+                           <li>
+                              <p><span class="liTitle"><span class="icode-attributeValue">pi</span>:</span> creates a proccessing instruction.
+                              </p>
+                           </li>
+                           <li>
+                              <p><span class="liTitle"><span class="icode-attributeValue">none</span>:</span> creates no element. The node will just be replaced by the selected content (see <span class="icode-attribute">select</span>).
+                              </p>
+                           </li>
+                        </ul>
+                     </p>
+                  </li>
+                  <li>
+                     <p><span class="liTitle"><span class="icode-attribute">target</span>:</span></p>
+                     <p>By using a QName, the <span class="icode-attribute">target</span> attribute gives the replacing node a name. This is necessary in case the value of the <span class="icode-attribute">node-type</span> attribute is not <span class="icode-attributeValue">comment</span> or <span class="icode-attributeValue">none</span>. You can use XPath in curly brackets.
+                     </p>
+                  </li>
+                  <li>
+                     <p><span class="liTitle"><span class="icode-attribute">select</span>:</span></p>
+                     <p>With <span class="icode-attribute">select</span> you can choose (with XPath) the content nodes of the replacing node. It copies the selected nodes by testing for other activities.
+                        Alternatively, you can create the content by writing it into the <span class="icode-element-sqf">&lt;sqf:replace&gt;</span> element. To copy nodes which may contain nodes which shall also be replaced, use the <span class="icode-element-sqf">&lt;sqf:keep&gt;</span> element as content of the <span class="icode-element-sqf">&lt;sqf:replace&gt;</span> element.
+                     </p>
+                  </li>
+               </ul>
+               <p>The following code example shows that you can use Schematron <span class="icode-element">&lt;let&gt;</span> elements in the <span class="icode-element-sqf">&lt;sqf:fix&gt;</span> element.
+               </p>
+               <div class="code" href="../files/userGuide/people5.sch" line="14-25">
+                  <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                     <col />
+                     <col />
+                     <tbody>
+                        <tr class="code-line" level="0">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">14</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"setAge"</span><span class="element" status="element">&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">15</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:description&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="2">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">16</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element-sqf" status="element">&lt;sqf:p&gt;</span><span class="none" status="none">Calculate the age from the date of birth.</span><span class="element-sqf" status="element">&lt;/sqf:p&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">17</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;/sqf:description&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">18</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;let</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"yearOfBirth"</span><span class="attribute" status="attribute"> value=</span><span class="attributeValue" status="attributeValue">"year-from-date($birth)"</span><span class="element" status="element">/&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">19</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;let</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"yearDif"</span><span class="attribute" status="attribute"> value=</span><span class="attributeValue" status="attributeValue">"$currYear - $yearOfBirth"</span><span class="element" status="element">/&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">20</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;let</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"birthdayInThisYear"</span><span class="attribute" status="attribute"> value=</span><span class="attributeValue" status="attributeValue">"replace(string($birth), string($yearOfBirth), string($currYear))"</span><span class="element" status="element">/&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">21</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element" status="element">&lt;let</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"newAge"</span><span class="attribute" status="attribute"> value=</span><span class="attributeValue" status="attributeValue">"if(xs:date($birthdayInThisYear) &gt; current-date()) </span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">22</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="attributeValue" status="attributeValue">                    then ($yearDif - 1)</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">23</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="attributeValue" status="attributeValue">                    else ($yearDif)"</span><span class="element" status="element">/&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="1">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">24</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:replace</span><span class="attribute" status="attribute"> match=</span><span class="attributeValue" status="attributeValue">"age"</span><span class="attribute" status="attribute"> target=</span><span class="attributeValue" status="attributeValue">"age"</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"$newAge"</span><span class="element" status="element">/&gt;</span></td>
+                        </tr>
+                        <tr class="code-line" level="0">
+                           <td class="lineNr" align="right" valign="top"><span class="lineNr">25</span></td>
+                           <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+               <div class="code-ref"><a href="../files/userGuide/people5.sch" target="_blank">to source.</a></div>
+               <p>Here, the <span class="icode-element">&lt;let&gt;</span> elements are used to calculate the correct age within the code. At the end the <span class="icode-element-sqf">&lt;sqf:replace&gt;</span> element is used to replace the <span class="icode-element">&lt;age&gt;</span> element (<span class="icode-attribute">match</span>) with a new <span class="icode-element">&lt;age&gt;</span> element (<span class="icode-attribute">target</span>). With the <span class="icode-attribute">select</span> attribute the <span class="icode-attributeValue">$newAge</span> variable is selected which contains the correct age.
+               </p>
+               <p><b>Note:</b> This is not the place to explain the XPath constructs for the calculation of the correct age.
+               </p>
+            </div>
+            <div id="sqf:d113e331" class="section">
+               <h3>Sidestep: Other activity elements</h3>
+               <p>Although we don't use them in the example, the behavior of the other activity elements will be described in the following.</p>
+               <div id="sqf:d113e336" class="section">
+                  <h4><span class="icode-element-sqf">&lt;sqf:add&gt;</span> element
+                  </h4>
+                  <p>With the <span class="icode-element-sqf">&lt;sqf:add&gt;</span> element you can add a node to the instance. You need a node (anchor node) to select the position for the new node. The anchor
+                     node is selected by the <span class="icode-attribute">match</span> attribute. In additon to the attributes of the other activity elements, the <span class="icode-element-sqf">&lt;sqf:add&gt;</span> element has an <span class="icode-attribute">axis</span> attribute. It determines the position of the node relatively to the anchor node. You can say that the new node should be
+                     the first child of the anchor node (<span class="icode-attributeValue">child</span>, default value) and that it should be the first following or preceding sibling (<span class="icode-attributeValue">following-sibling</span>/<span class="icode-attributeValue">following</span> and <span class="icode-attributeValue">preceding-sibling</span>/<span class="icode-attributeValue">preceding</span>). If you want to add an attribute to the anchor node, you need the values <span class="icode-attributeValue">attribute</span> or <span class="icode-attributeValue">@</span>.
+                  </p>
+               </div>
+               <div id="sqf:d113e377" class="section">
+                  <h4><span class="icode-element-sqf">&lt;sqf:stringReplace&gt;</span> element
+                  </h4>
+                  <p>This activity element is different from the others. It should be used to find substrings of the text content and replace it
+                     with nodes or other strings. With <span class="icode-attribute">match</span> you can select text nodes which contain the substrings you want to replace. With the <span class="icode-attribute">regex</span> attribute you match the substrings using a regular expression. The content of the <span class="icode-element-sqf">&lt;sqf:stringReplace&gt;</span> element defines the nodes which replace the substrings.
+                  </p>
+               </div>
+            </div>
+         </div>
+         <div class="uplink"><a href="#">top</a></div>
+         <div id="sqf:d113e393" class="section">
+            <h2 navTitle="Parameters">Step 6: Parameters</h2>
+            <p>Now you have your first two workable QuickFixes. To be able to successfully apply the example, you need to complete the last
+               QuickFix. For this, let us assume that the correct date of birth is always 5 April 1986. With the current knowlege we can
+               write a QuickFix for this:
+            </p>
+            <div class="code" href="../files/userGuide/people5.sch" highlight="32-37">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">1</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:0em;"></span><span class="unhighlight" status="none">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">2</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:2em;"></span><span class="unhighlight" status="element">&lt;schema</span><span class="unhighlight" status="attribute"> xmlns=</span><span class="unhighlight" status="attributeValue">"http://purl.oclc.org/dsdl/schematron"</span><span class="unhighlight" status="attribute"> queryBinding=</span><span class="unhighlight" status="attributeValue">"xslt2"</span><span class="unhighlight" status="attribute"> xmlns:sqf=</span><span class="unhighlight" status="attributeValue">"http://www.schematron-quickfix.com/validator/process"</span><span class="unhighlight" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">3</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:2em;"></span><span class="unhighlight" status="element">&lt;title&gt;</span><span class="unhighlight" status="none">People - test</span><span class="unhighlight" status="element">&lt;/title&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">4</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:2em;"></span><span class="unhighlight" status="element">&lt;pattern&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">5</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:4em;"></span><span class="unhighlight" status="element">&lt;rule</span><span class="unhighlight" status="attribute"> context=</span><span class="unhighlight" status="attributeValue">"person"</span><span class="unhighlight" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">6</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;let</span><span class="unhighlight" status="attribute"> name=</span><span class="unhighlight" status="attributeValue">"currYear"</span><span class="unhighlight" status="attribute"> value=</span><span class="unhighlight" status="attributeValue">"year-from-date(current-date())"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">7</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;let</span><span class="unhighlight" status="attribute"> name=</span><span class="unhighlight" status="attributeValue">"maxBirth"</span><span class="unhighlight" status="attribute"> value=</span><span class="unhighlight" status="attributeValue">"replace(string(current-date()),string($currYear), string($currYear - age - 1))"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">8</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;let</span><span class="unhighlight" status="attribute"> name=</span><span class="unhighlight" status="attributeValue">"minBirth"</span><span class="unhighlight" status="attribute"> value=</span><span class="unhighlight" status="attributeValue">"replace(string(current-date()),string($currYear), string($currYear - age))"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">9</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;let</span><span class="unhighlight" status="attribute"> name=</span><span class="unhighlight" status="attributeValue">"birth"</span><span class="unhighlight" status="attribute"> value=</span><span class="unhighlight" status="attributeValue">"xs:date(dateOfBirth)"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">  </span></td>
+                        <td class="line"><span class="skip" style="margin-left:8em;">[...]</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">12</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;assert</span><span class="unhighlight" status="attribute"> test=</span><span class="unhighlight" status="attributeValue">"$birth gt xs:date($maxBirth) and $birth le xs:date($minBirth)"</span><span class="unhighlight" status="attribute"> sqf:fix=</span><span class="unhighlight" status="attributeValue">"setAge"</span><span class="unhighlight" status="element">&gt;</span><span class="unhighlight" status="element">&lt;value-of</span><span class="unhighlight" status="attribute"> select=</span><span class="unhighlight" status="attributeValue">"name"</span><span class="unhighlight" status="element">/&gt;</span><span class="unhighlight" status="none"> is not </span><span class="unhighlight" status="element">&lt;value-of</span><span class="unhighlight" status="attribute"> select=</span><span class="unhighlight" status="attributeValue">"age"</span><span class="unhighlight" status="element">/&gt;</span><span class="unhighlight" status="none"> years old or is not born on </span><span class="unhighlight" status="element">&lt;value-of</span><span class="unhighlight" status="attribute"> select=</span><span class="unhighlight" status="attributeValue">"dateOfBirth"</span><span class="unhighlight" status="element">/&gt;</span><span class="unhighlight" status="none">.</span><span class="unhighlight" status="element">&lt;/assert&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">13</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;assert</span><span class="unhighlight" status="attribute"> test=</span><span class="unhighlight" status="attributeValue">"not($birth gt xs:date($maxBirth) and $birth le xs:date($minBirth)) or number(age) ge 18"</span><span class="unhighlight" status="attribute"> sqf:fix=</span><span class="unhighlight" status="attributeValue">"delete birthEntry"</span><span class="unhighlight" status="element">&gt;</span><span class="unhighlight" status="element">&lt;value-of</span><span class="unhighlight" status="attribute"> select=</span><span class="unhighlight" status="attributeValue">"name"</span><span class="unhighlight" status="element">/&gt;</span><span class="unhighlight" status="none"> is too young.</span><span class="unhighlight" status="element">&lt;/assert&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">14</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;sqf:fix</span><span class="unhighlight" status="attribute"> id=</span><span class="unhighlight" status="attributeValue">"setAge"</span><span class="unhighlight" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">15</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="5">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">16</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:10em;"></span><span class="unhighlight" status="element">&lt;sqf:p&gt;</span><span class="unhighlight" status="none">Calculate the age from the date of birth.</span><span class="unhighlight" status="element">&lt;/sqf:p&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">17</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;/sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">18</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;let</span><span class="unhighlight" status="attribute"> name=</span><span class="unhighlight" status="attributeValue">"yearOfBirth"</span><span class="unhighlight" status="attribute"> value=</span><span class="unhighlight" status="attributeValue">"year-from-date($birth)"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">19</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;let</span><span class="unhighlight" status="attribute"> name=</span><span class="unhighlight" status="attributeValue">"yearDif"</span><span class="unhighlight" status="attribute"> value=</span><span class="unhighlight" status="attributeValue">"$currYear - $yearOfBirth"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">20</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;let</span><span class="unhighlight" status="attribute"> name=</span><span class="unhighlight" status="attributeValue">"birthdayInThisYear"</span><span class="unhighlight" status="attribute"> value=</span><span class="unhighlight" status="attributeValue">"replace(string($birth), string($yearOfBirth), string($currYear))"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">21</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;let</span><span class="unhighlight" status="attribute"> name=</span><span class="unhighlight" status="attributeValue">"newAge"</span><span class="unhighlight" status="attribute"> value=</span><span class="unhighlight" status="attributeValue">"if(xs:date($birthdayInThisYear) &gt; current-date()) </span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">22</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="attributeValue">                    then ($yearDif - 1)</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">23</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="attributeValue">                    else ($yearDif)"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">24</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;sqf:replace</span><span class="unhighlight" status="attribute"> match=</span><span class="unhighlight" status="attributeValue">"age"</span><span class="unhighlight" status="attribute"> target=</span><span class="unhighlight" status="attributeValue">"age"</span><span class="unhighlight" status="attribute"> select=</span><span class="unhighlight" status="attributeValue">"$newAge"</span><span class="unhighlight" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">25</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">26</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;sqf:fix</span><span class="unhighlight" status="attribute"> id=</span><span class="unhighlight" status="attributeValue">"delete"</span><span class="unhighlight" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">27</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="5">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">28</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:10em;"></span><span class="unhighlight" status="element">&lt;sqf:p&gt;</span><span class="unhighlight" status="none">Delete the person from the list.</span><span class="unhighlight" status="element">&lt;/sqf:p&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">29</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;/sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">30</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:8em;"></span><span class="unhighlight" status="element">&lt;sqf:delete/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">31</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:6em;"></span><span class="unhighlight" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">32</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="element-sqf" status="element">&lt;sqf:fix</span><span class="attribute" status="attribute"> id=</span><span class="attributeValue" status="attributeValue">"birthEntry"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">33</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:8em;"></span><span class="element-sqf" status="element">&lt;sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="5">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">34</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:10em;"></span><span class="element-sqf" status="element">&lt;sqf:p&gt;</span><span class="none" status="none">The age and the date of birth are wrong. Enter the correct date of birth.</span><span class="element-sqf" status="element">&lt;/sqf:p&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">35</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:8em;"></span><span class="element-sqf" status="element">&lt;/sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="4">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">36</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:8em;"></span><span class="element-sqf" status="element">&lt;sqf:replace</span><span class="attribute" status="attribute"> match=</span><span class="attributeValue" status="attributeValue">"dateOfBirth"</span><span class="attribute" status="attribute"> target=</span><span class="attributeValue" status="attributeValue">"dateOfBirth"</span><span class="element" status="element">&gt;</span><span class="none" status="none">1986-04-05</span><span class="element-sqf" status="element">&lt;/sqf:replace&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="3">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">37</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:6em;"></span><span class="element-sqf" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">38</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:4em;"></span><span class="unhighlight" status="element">&lt;/rule&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">39</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:2em;"></span><span class="unhighlight" status="element">&lt;/pattern&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">40</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:0em;"></span><span class="unhighlight" status="element">&lt;/schema&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people5.sch" target="_blank">to source.</a></div>
+            
+            <p>The last task is to parametrise the date and give the user the chance to select the correct date individually. For that it
+               is necessary to define the date by a parameter with the <span class="icode-element-sqf">&lt;sqf:param&gt;</span> element. It works like the <span class="icode-element-xsl">&lt;xsl:param&gt;</span> element with a <span class="icode-attribute">name</span> attribute for the name of the parameter.
+            </p>
+            <p>You can use the following attributes:</p>
+            <ul>
+               <li>
+                  <p><span class="icode-attribute">as</span> for the required data type (XML Schema type)
+                  </p>
+               </li>
+               <li>
+                  <p><span class="icode-attribute">required</span> (<span class="icode-attributeValue">yes</span>|<span class="icode-attributeValue">no</span>)
+                  </p>
+               </li>
+               <li>
+                  <p><span class="icode-attribute">select</span> for the default value (XPath)
+                  </p>
+               </li>
+            </ul>
+            <p>As in XSLT the parameters can be used like variables:</p>
+            <div class="code" href="../files/userGuide/people6.sch" line="32-38" highlight="36-37">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">32</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:0em;"></span><span class="unhighlight" status="element">&lt;sqf:fix</span><span class="unhighlight" status="attribute"> id=</span><span class="unhighlight" status="attributeValue">"birthEntry"</span><span class="unhighlight" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">33</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:2em;"></span><span class="unhighlight" status="element">&lt;sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">34</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:4em;"></span><span class="unhighlight" status="element">&lt;sqf:p&gt;</span><span class="unhighlight" status="none">The age and the date of birth is wrong. Entry the correct birthday.</span><span class="unhighlight" status="element">&lt;/sqf:p&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">35</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:2em;"></span><span class="unhighlight" status="element">&lt;/sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">36</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:param</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"birth"</span><span class="attribute" status="attribute"> as=</span><span class="attributeValue" status="attributeValue">"xs:date"</span><span class="attribute" status="attribute"> required=</span><span class="attributeValue" status="attributeValue">"no"</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"xs:date('1986-04-05')"</span><span class="element" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">37</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:replace</span><span class="attribute" status="attribute"> match=</span><span class="attributeValue" status="attributeValue">"dateOfBirth"</span><span class="attribute" status="attribute"> target=</span><span class="attributeValue" status="attributeValue">"dateOfBirth"</span><span class="attribute" status="attribute"> select=</span><span class="attributeValue" status="attributeValue">"$birth"</span><span class="element" status="element">/&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">38</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:0em;"></span><span class="unhighlight" status="element">&lt;/sqf:fix&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people6.sch" target="_blank">to source.</a></div>
+         </div>
+         <div class="uplink"><a href="#">top</a></div>
+         <div id="sqf:d113e442" class="section">
+            <h2 navTitle="Define an user entry">Step 7: Defining an user entry</h2>
+            <p>The second step to parametrise the date is to define an user entry. For this the <span class="icode-element-sqf">&lt;sqf:fix&gt;</span> element can contain a <span class="icode-element-sqf">&lt;sqf:user-entry&gt;</span> element. To connect the <span class="icode-element-sqf">&lt;sqf:user-entry&gt;</span> element with a parameter, it must have the required <span class="icode-attribute">ref</span> attribute. The value of the <span class="icode-attribute">ref</span> attribute should reference a parameter name.
+            </p>
+            <div class="code" href="../files/userGuide/people7.sch" line="36,40-41">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">36</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:user-entry</span><span class="attribute" status="attribute"> ref=</span><span class="attributeValue" status="attributeValue">"birth"</span><span class="element" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">  </span></td>
+                        <td class="line"><span class="skip" style="margin-left:2em;">[...]</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">40</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;/sqf:user-entry&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">41</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:0em;"></span><span class="element-sqf" status="element">&lt;sqf:param</span><span class="attribute" status="attribute"> name=</span><span class="attributeValue" status="attributeValue">"birth"</span><span class="attribute" status="attribute"> as=</span><span class="attributeValue" status="attributeValue">"xs:date"</span><span class="attribute" status="attribute"> required=</span><span class="attributeValue" status="attributeValue">"yes"</span><span class="element" status="element">/&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people7.sch" target="_blank">to source.</a></div>
+            <p>The parameter does not need a default value any more. Instead, the parameter is now required.</p>
+            <p>The user entry needs a description so that the user knows which information is wanted. For this the user entry should contain
+               a <span class="icode-element-sqf">&lt;sqf:description&gt;</span> element similar to the <span class="icode-element-sqf">&lt;sqf:fix&gt;</span> element:
+            </p>
+            <div class="code" href="../files/userGuide/people7.sch" line="36-40" highlight="37-39">
+               <table xmlns:saxon="http://saxon.sf.net/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg" cellpadding="0" cellspacing="0">
+                  <col />
+                  <col />
+                  <tbody>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">36</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:0em;"></span><span class="unhighlight" status="element">&lt;sqf:user-entry</span><span class="unhighlight" status="attribute"> ref=</span><span class="unhighlight" status="attributeValue">"birth"</span><span class="unhighlight" status="element">&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">37</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="2">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">38</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:4em;"></span><span class="element-sqf" status="element">&lt;sqf:p&gt;</span><span class="none" status="none">Enter the correct date.</span><span class="element-sqf" status="element">&lt;/sqf:p&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="1">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">39</span></td>
+                        <td class="line"><span class="none" status="none" style="margin-left:2em;"></span><span class="element-sqf" status="element">&lt;/sqf:description&gt;</span></td>
+                     </tr>
+                     <tr class="code-line" level="0">
+                        <td class="lineNr" align="right" valign="top"><span class="lineNr">40</span></td>
+                        <td class="line"><span class="unhighlight" status="none" style="margin-left:0em;"></span><span class="unhighlight" status="element">&lt;/sqf:user-entry&gt;</span></td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="code-ref"><a href="../files/userGuide/people7.sch" target="_blank">to source.</a></div>
+         </div>
+         <div class="uplink"><a href="#">top</a></div>
+      </div>
+   </body>
+</html>
