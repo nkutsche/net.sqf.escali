@@ -1,3 +1,20 @@
+REM 	Copyright (c) 2014 Nico Kutscherauer
+	
+REM 	This file is part of Escali Schematron.
+
+REM 	Escali Schematron is free software: you can redistribute it and/or modify
+REM 	it under the terms of the GNU General Public License as published by
+REM 	the Free Software Foundation, either version 3 of the License, or
+REM 	(at your option) any later version.
+
+REM 	Escali Schematron is distributed in the hope that it will be useful,
+REM 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+REM 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+REM 	GNU General Public License for more details.
+
+REM 	You should have received a copy of the GNU General Public License
+REM 	along with Escali Schematron.  If not, see http://www.gnu.org/licenses/gpl-3.0.
+
 
 @echo off
 
@@ -23,6 +40,8 @@ java -cp "calabash.jar; lib/" com.xmlcalabash.drivers.Main --input source=%SOURC
 
 if "%3"=="" goto eop
 
+echo The schematron report should be opened automaticaly. If not you will find it here:
+echo %HTML%
 echo.
 echo The Schematron report contains the IDs of the QuickFix to execute them:
 echo.
@@ -50,7 +69,7 @@ echo      [user-entry] entry-name  This is an user entry
 echo      [user-entry] other-entry This is another user entry
 echo.
 echo In order to set the value of the user entry type it using following pattern:
-echo entry-name=[value];other-entry=[next-value]
+echo entry-name="[value]";other-entry="[next-value]"
 echo.
 echo. If the QuickFix does not have user entries just use the [enter] key
 echo.

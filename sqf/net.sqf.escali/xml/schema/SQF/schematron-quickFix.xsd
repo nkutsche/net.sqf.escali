@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--  
+    Copyright (c) 2014 Nico Kutscherauer
+        
+    This file is part of Escali Schematron.
+    
+    Escali Schematron is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    Escali Schematron is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with Escali Schematron.  If not, see http://www.gnu.org/licenses/gpl-3.0.
+    
+    -->
+
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="http://www.schematron-quickfix.com/validator/process" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xml:lang="en">
     <xs:import namespace="http://purl.oclc.org/dsdl/schematron" schemaLocation="schematron-schema.xsd"/>
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
@@ -50,7 +71,7 @@
 
     <xs:group name="templateElements">
         <xs:annotation>
-            <xs:documentation>This element group describes the content of the activity elements. The behaviour is similar to the content of the <icode type="element">xsl:template</icode> element. Additionally, the elements <icode type="element">sch:value-of</icode> and <icode type="element">sch:let</icode> are treated as <icode type="element">xsl:value-of</icode> and <icode type="element">xsl:variable</icode>. Also the <a href="#sqf_keep" intern="yes"><icode type="element">sqf:keep</icode></a> element is available.</xs:documentation>
+            <xs:documentation>This element group describes the content of the activity elements. The behaviour is similar to the content of the <icode type="element">xsl:template</icode> element. Additionally, the elements <icode type="element">sch:value-of</icode> and <icode type="element">sch:let</icode> are treated as <icode type="element">xsl:value-of</icode> and <icode type="element">xsl:variable</icode>. Also the <a ref="#sqf_keep"><icode type="element">sqf:keep</icode></a> element is available.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -156,7 +177,7 @@
             </xs:sequence>
             <xs:attribute name="ref" type="xs:string" use="required">
                 <xs:annotation>
-                    <xs:documentation>The attribute refers to a <a href="#sqf_param" intern="yes"><icode type="element">sqf:param</icode></a> element.</xs:documentation>
+                    <xs:documentation>The attribute refers to a <a ref="#sqf_param"><icode type="element">sqf:param</icode></a> element.</xs:documentation>
                     <xs:documentation source="Value">The value has to be the name of a parameter which is within the same QuickFix.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
@@ -166,7 +187,7 @@
     <xs:element name="call-fix">
         <xs:annotation>
             <xs:documentation>This element calls another QuickFix within a QuickFix. The called QuickFix must be defined globally or for the same Schematron rule as the calling QuickFix. A calling QuickFix should not have other activity elements.</xs:documentation>
-            <xs:documentation>The calling QuickFix adopts the activity elements of the called QuickFix. With the help of parameters, these can be specified (see <a href="#sqf_with-param" intern="yes"><icode type="element">sqf:with-param</icode></a>).</xs:documentation>
+            <xs:documentation>The calling QuickFix adopts the activity elements of the called QuickFix. With the help of parameters, these can be specified (see <a ref="#sqf_with-param"><icode type="element">sqf:with-param</icode></a>).</xs:documentation>
             <xs:documentation>The description and other characteristics (e.g. @use-when) of the called QuickFix will not be adopted.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
@@ -201,7 +222,7 @@
     </xs:element>
     <xs:element name="param">
         <xs:annotation>
-            <xs:documentation>This element defines a parameter for a QuickFix. The parameter can be used like a variable within the QuickFix. The value can be set by the <a href="#sqf_with-param" intern="yes"><icode type="element">sqf:with-param</icode></a> element or manually by the user if the user entry is referred by a <a href="#sqf_user-entry" intern="yes"><icode type="element">sqf:user-entry</icode></a> element.</xs:documentation>
+            <xs:documentation>This element defines a parameter for a QuickFix. The parameter can be used like a variable within the QuickFix. The value can be set by the <a ref="#sqf_with-param"><icode type="element">sqf:with-param</icode></a> element or manually by the user if the user entry is referred by a <a ref="#sqf_user-entry"><icode type="element">sqf:user-entry</icode></a> element.</xs:documentation>
             <xs:documentation>The content defines a default value for the parameter.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
@@ -283,7 +304,7 @@
     <xs:element name="add">
         <xs:annotation>
             <xs:documentation>This activity element adds a node to one or more nodes of the XML instance.</xs:documentation>
-            <xs:documentation>The attributes <icode type="attribute">match</icode> and <icode type="attribute">axis</icode> define the position where the nodes will be added. The position is determined by the anchor node(s) (<a href="#activityBase_match" intern="yes">@match</a>) and the insertion direction (<a href="#add_axis" intern="yes">@axis</a>).</xs:documentation>
+            <xs:documentation>The attributes <icode type="attribute">match</icode> and <icode type="attribute">axis</icode> define the position where the nodes will be added. The position is determined by the anchor node(s) (<a ref="#activityBase_match">@match</a>) and the insertion direction (<a ref="#add_axis">@axis</a>).</xs:documentation>
             <xs:documentation>The attributes <icode type="attribute">node-type</icode>, <icode type="attribute">select</icode> and <icode type="attribute">target</icode> and the content of the element define the nodes to be added.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
@@ -292,7 +313,7 @@
             </xs:choice>
             <xs:attribute name="axis" type="sqf:axisType">
                 <xs:annotation>
-                    <xs:documentation>The <icode type="attribute">axis</icode> attribute defines the position of the nodes to be added relatively to the anchor node (see <a href="#activityBase_match" intern="yes">@match</a>).</xs:documentation>
+                    <xs:documentation>The <icode type="attribute">axis</icode> attribute defines the position of the nodes to be added relatively to the anchor node (see <a ref="#activityBase_match">@match</a>).</xs:documentation>
                     <xs:documentation source="Default">If the value of the <icode type="attribute">node-type</icode> attribute is <icode type="attributeValue">attribute</icode>, the default value is <icode type="attributeValue">attribute</icode>. Otherwise the default value is <icode type="attributeValue">child</icode>.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
@@ -322,7 +343,7 @@
             <xs:annotation>
                 <xs:documentation>The <icode type="attribute">match</icode> attribute defines anchor nodes for an activity element.</xs:documentation>
                 <xs:documentation>For each selected anchor node, the command of the activity element will be executed. For each execution, the context will be set to the anchor node.</xs:documentation>
-                <xs:documentation>Exception: The <icode type="attribute">match</icode> attribute of the <a href="#sqf_stringReplace" intern="yes"><icode type="element">sqf:stringReplace</icode></a> element should only select text nodes.</xs:documentation>
+                <xs:documentation>Exception: The <icode type="attribute">match</icode> attribute of the <a ref="#sqf_stringReplace"><icode type="element">sqf:stringReplace</icode></a> element should only select text nodes.</xs:documentation>
                 <xs:documentation source="Value">XPath expression. The context of relative expressions is the context of the related Schematron rule.</xs:documentation>
                 <xs:documentation source="Default">By default the anchor node is the context node of the related Schematron rule.</xs:documentation>
             </xs:annotation>
