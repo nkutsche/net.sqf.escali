@@ -5,6 +5,9 @@
         SGML systems and applications as defined in ISO 8879, 
         provided this notice is included in all copies.
 -->
+<!--
+    This file is addapted for the Escali Schematron from Nico Kutscherauer.
+-->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:es="http://www.escali.schematron-quickfix.com/" elementFormDefault="qualified" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" targetNamespace="http://purl.oclc.org/dsdl/schematron" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xml:lang="en">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
     <xs:import namespace="http://www.schematron-quickfix.com/validator/process" schemaLocation="schematron-quickFix.xsd"/>
@@ -12,9 +15,10 @@
     
     <xs:annotation>
         <xs:appinfo source="sqf:meta">
-            <meta>
+            <meta keywords="Schematron QuickFix reference, Escalie reference, Schematron QuickFix elements, QuickFix element, sqf:fix, &lt;sqf:fix&gt;, QuickFixes for Schematron, QuickFix syntax">
                 <title>Schematron QuickFix &#x2013; extension references</title>
                 <navTitle idx="5" subMenuLevel="4">Extension references</navTitle>
+                <description>This page contains the reference of the Schematron QuickFix extension language.</description>
             </meta>
             <title>Extension references</title>
         </xs:appinfo>
@@ -208,6 +212,7 @@
             <xs:attribute name="id" type="xs:ID"/>
             <xs:attribute name="is-a" type="xs:IDREF"/>
             <xs:attribute ref="es:matchType"/>
+            <xs:attribute ref="es:active"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="phase">

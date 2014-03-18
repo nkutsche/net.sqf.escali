@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2014 Nico Kutscherauer
+    
+    This file is part of Escali Schematron (XProc implementation).
+    
+    Escali Schematron is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    Escali Schematron is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with Escali Schematron (../xsl/gpl-3.0.txt).  If not, see http://www.gnu.org/licenses/gpl-3.0.
+    
+-->
+
 <p:library xmlns:p="http://www.w3.org/ns/xproc" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.w3.org/ns/xproc-step" version="1.0">
 
     <p:declare-step type="es:validateAndFix" name="es_validateAndFix">
@@ -152,15 +173,22 @@
         <p:output port="result" primary="true"/>
         <p:option name="phase" select="'#ALL'"/>
         <p:option name="lang" select="'#ALL'"/>
-
-        <p:xslt name="excali1">
+        
+        <p:validate-with-xml-schema>
             <p:input port="source">
                 <p:pipe port="schema" step="es_schematron"/>
             </p:input>
+            <p:input port="schema">
+                <p:document href="../schema/SQF/schematron-schema.xsd"/>
+            </p:input>
+        </p:validate-with-xml-schema>
+
+        <p:xslt name="excali1">
             <p:input port="stylesheet">
                 <p:document href="../xsl/01_compiler/escali_compiler_1_include.xsl"/>
             </p:input>
             <p:with-param name="es:lang" select="$lang"/>
+            <p:with-param name="es:type-available" select="'false'"/>
         </p:xslt>
         <p:xslt name="excali2">
             <p:input port="stylesheet">
@@ -189,6 +217,11 @@
             </p:input>
             <p:with-param name="dummy" select="''"/>
         </p:xslt>
+        <p:validate-with-xml-schema>
+            <p:input port="schema">
+                <p:document href="../schema/SVRL/svrl.xsd"/>
+            </p:input>
+        </p:validate-with-xml-schema>
     </p:declare-step>
     <p:declare-step type="es:quickFix" name="es_quickFix">
         <p:input port="svrl" primary="true"/>
@@ -227,12 +260,29 @@
         <p:input port="source" primary="true"/>
         <p:option name="xsmFolder"/>
         <p:option name="tempFolder"/>
+        <p:option name="system" select="'bat'"/>
 
         <p:variable name="cwd" select="replace($xsmFolder, '^file:', '')"/>
-        <p:variable name="command" select="replace(concat($xsmFolder,'xsm.bat'), '^file:', '')"/>
+        <p:variable name="xsmScript" select=" replace(concat($xsmFolder,'xsm.', $system), '^file:', '')"/>
+        <p:variable name="command" select="   if ($system='bat') 
+                                            then ($xsmScript) 
+                                            else ($system)"/>
         <p:variable name="manipulator" select="replace(concat($tempFolder, '/manipulator.tmp'), '^file:', '')"/>
         <p:variable name="outFile" select="replace(resolve-uri('../../temp/tempOutput.xml'), '^file:', '')"/>
-        <p:variable name="args" select="concat($manipulator, ' -o ', $outFile)"/>
+        <p:variable name="args" select="concat( if ($system='bat') 
+                                              then ('') 
+                                              else ($xsmScript), ' ', $manipulator, ' -o ', $outFile)"/>
+        <p:load name="xsm-schema">
+            <p:with-option name="href" select="resolve-uri('xml/schema/XSM/xpath-based-string-manipulator.xsd', $xsmFolder)"/>
+        </p:load>
+        <p:validate-with-xml-schema>
+            <p:input port="source">
+                <p:pipe port="source" step="es_xsm"/>
+            </p:input>
+            <p:input port="schema">
+                <p:pipe port="result" step="xsm-schema"/>
+            </p:input>
+        </p:validate-with-xml-schema>
         <p:store name="storeManSheet">
             <p:with-option name="href" select="$manipulator"/>
         </p:store>

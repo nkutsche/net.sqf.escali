@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2014 Nico Kutscherauer
+    
+    This file is part of Escali Schematron (XProc implementation).
+    
+    Escali Schematron is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    Escali Schematron is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with Escali Schematron (../xsl/gpl-3.0.txt).  If not, see http://www.gnu.org/licenses/gpl-3.0.
+
+-->
+
+
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:sqf="http://www.schematron-quickfix.com/validator/process"
     xmlns:c="http://www.w3.org/ns/xproc-step" version="1.0" name="main-escali-quickFix">
     
@@ -11,6 +32,7 @@
     
     <p:option name="fixId"/>
     <p:option name="userEntries" select="''"/>
+    <p:option name="system" select="'bat'"/>
     
     <p:import href="escali-schematron-lib.xpl"/>
     
@@ -70,10 +92,11 @@
         <p:variable name="xsmFolder" select="resolve-uri(/es:config/es:output/es:xsm-processor, document-uri(/))">
             <p:pipe port="config" step="main-escali-quickFix"/>
         </p:variable>
-        <p:when test="$xml-save-mode='true'">
+        <p:when test="$xml-save-mode='true' and $system='bat'">
             <es:xsm>
                 <p:with-option name="tempFolder" select="$tempFolder"/>
                 <p:with-option name="xsmFolder" select="$xsmFolder"/>
+                <p:with-option name="system" select="$system"/>
             </es:xsm>
         </p:when>
         <p:otherwise>
