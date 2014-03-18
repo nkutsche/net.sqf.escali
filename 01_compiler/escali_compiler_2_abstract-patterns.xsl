@@ -1,32 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--  
+    Copyright (c) 2014 Nico Kutscherauer
+        
+    This file is part of Escali Schematron.
+    
+    Escali Schematron is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    Escali Schematron is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with Escali Schematron.  If not, see http://www.gnu.org/licenses/gpl-3.0.
+    
+    -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" exclude-result-prefixes="xs xd sch axsl es" version="2.0">
     <xsl:include href="escali_compiler_2_sqf-user-entry.xsl"/>
+
     <xd:doc scope="stylesheet">
         <xd:desc>
             <xd:p><xd:b>Created on:</xd:b> Nov 19, 2013</xd:p>
             <xd:p><xd:b>Author:</xd:b> Nico Kutscherauer</xd:p>
-            <xd:p/>
         </xd:desc>
     </xd:doc>
     
-    
+    <xd:doc scope="version">
+        <xd:desc>
+            <xd:p>Version information</xd:p>
+            <xd:ul>
+                <xd:li>
+                    <xd:p>2014-03-14</xd:p>
+                    <xd:ul>
+                        <xd:li>
+                            <xd:p>publishing version</xd:p>
+                        </xd:li>
+                    </xd:ul>
+                </xd:li>
+            </xd:ul>
+        </xd:desc>
+    </xd:doc>
+
+
     <!--
-	   escali preprocess 2
+	   Escali preprocess 2
 	   Schematron:
 	        abstracts Schematron patterns
 	       
-	   sx extensions:
+	   es extensions:
 	       languages of diagnostics
 	   
 	-->
-    
+
     <xsl:output/>
     <!--	-->
     <xsl:namespace-alias stylesheet-prefix="axsl" result-prefix="xsl"/>
 
     <xsl:key name="abstractById" match="*[@abstract='true']" use="@id"/>
-    
-<!--  
+
+    <!--  
         Handling a pattern call
     -->
     <xsl:template match="sch:pattern[@is-a]">
@@ -49,7 +84,7 @@
 
     <xsl:template match="sch:pattern[@abstract='true']"/>
 
-<!--
+    <!--
         Resolve the abstract patterns
         The resolved pattern gets the id of the calling pattern.
         @es:is-a safes the id of the called pattern.
@@ -71,7 +106,7 @@
         </xsl:copy>
     </xsl:template>
 
-<!--  
+    <!--  
         resolves the parameters of the called pattern
         
     -->
@@ -84,7 +119,7 @@
             </xsl:call-template>
         </xsl:attribute>
     </xsl:template>
-<!--
+    <!--
         recursive template, resolves all parameters of a pattern call
         $value -> attribute value, wich could contains the param
         $params -> parameter of a calling pattern (sch:param)
@@ -126,7 +161,7 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
     <!--  
         copies nodes of the refered rules
     -->
@@ -134,13 +169,13 @@
         <xsl:variable name="rule" select="@rule"/>
         <xsl:apply-templates select="key('abstractById', $rule)/node()"/>
     </xsl:template>
-    
+
     <!--  
         deletes abstract rules
     -->
     <xsl:template match="sch:rule[@abstract='true']"/>
-    
-<!--    
+
+    <!--    
         sx extension:
         concern asserts / reports which contains no message (after the es:lang filter):
         if they refer to exactly one diagnostic
@@ -155,8 +190,8 @@
                                        else (@*, node())"/>
         </xsl:copy>
     </xsl:template>
-    
-<!-- 
+
+    <!-- 
         copies all nodes:
     -->
     <xsl:template match="node() | @*" mode="#all">
@@ -165,5 +200,5 @@
             <xsl:apply-templates select="node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
-    
+
 </xsl:stylesheet>
