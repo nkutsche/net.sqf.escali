@@ -39,6 +39,9 @@
                 <p:pipe port="source" step="es_validateAndFix"/>
             </p:input>
             <p:with-option name="phase" select="$phase"/>
+            <p:input port="params">
+                <p:pipe port="params" step="es_validateAndFix"/>
+            </p:input>
         </es:schematron>
         <p:for-each name="parameters">
             <p:iteration-source select="/svrl:schematron-output/svrl:*[local-name() = 'failed-assert' or local-name() = 'successful-report'][xs:integer($msgPos)]/sqf:fix[@fixId=$fixName]/sqf:user-entry/sqf:param">
@@ -73,13 +76,14 @@
         </es:quickFix>
         <p:choose>
             <p:when test="$xml-save-mode='true'">
-                <p:variable name="sourceFolder" select="replace(document-uri(/), '^file:', '')">
+                <p:variable name="sourceFolder" select="replace(resolve-uri('.', document-uri(/)), '^file:', '')">
                     <p:pipe port="source" step="es_validateAndFix"/>
                 </p:variable>
-                <es:xsm>
-                    <p:with-option name="out-id" select="concat($fixName, '_', $msgPos)"/>
+                <es:xsm name="xsm">
                     <p:with-option name="tempFolder" select="$sourceFolder"/>
+                    <p:with-option name="xsmFolder" select="resolve-uri('../../../net.sqf.xsm/xsm/v0.1/')"/>
                 </es:xsm>
+                <p:load href="../../temp/tempOutput.xml"  cx:depends-on="xsm"/>
             </p:when>
             <p:otherwise>
                 <p:identity/>
@@ -170,9 +174,12 @@
     <p:declare-step type="es:schematron" name="es_schematron">
         <p:input port="schema"/>
         <p:input port="source" primary="true"/>
+        <p:input port="params" kind="parameter">
+            <p:empty/>
+        </p:input>
         <p:output port="result" primary="true"/>
         <p:option name="phase" select="'#ALL'"/>
-        <p:option name="lang" select="'#ALL'"/>
+        <p:option name="lang" select="'#DEFAULT'"/>
         
         <p:validate-with-xml-schema>
             <p:input port="source">
@@ -209,7 +216,9 @@
             <p:input port="stylesheet">
                 <p:pipe port="result" step="excali3"/>
             </p:input>
-            <p:with-param name="dummy" select="''"/>
+            <p:input port="parameters">
+                <p:pipe port="params" step="es_schematron"/>
+            </p:input>
         </p:xslt>
         <p:xslt>
             <p:input port="stylesheet">

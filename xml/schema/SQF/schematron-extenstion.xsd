@@ -23,10 +23,10 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="http://www.escali.schematron-quickfix.com/" xmlns:es="http://www.escali.schematron-quickfix.com/" xml:lang="en">
     <xs:annotation>
         <xs:appinfo source="sqf:meta">
-            <title navTitle="Escali extensions">Escali Schematron extensions</title>
+            <title navTitle="Escali extensions" id="es-extensions">Escali Schematron extensions</title>
         </xs:appinfo>
         <xs:appinfo source="sqf:meta" xml:lang="de">
-            <title navTitle="Escali Erweiterungen">Escali Schematron-Erweiterungen</title>
+            <title navTitle="Escali Erweiterungen" id="es-extensions">Escali Schematron-Erweiterungen</title>
         </xs:appinfo>
     </xs:annotation>
     <xs:attribute name="matchType" default="first">
@@ -55,12 +55,28 @@
         </xs:annotation>
     </xs:attribute>
     <xs:attribute name="active" default="auto">
-        
+        <xs:annotation>
+            <xs:documentation>tbd</xs:documentation>
+            <!--<xs:documentation>This attribute sets the default value to the activity of a pattern. This value will be respected, only if the pattern is no activated by a sch:active element or deactivated by an es:inactive element.</xs:documentation>-->
+            <xs:documentation xml:lang="de">Legt den Default-Wert für die Aktivierung eines Patterns fest. Dieser Wert wird nur berücksichtigt, wenn das Pattern nicht ein sch:active-Element aktiviert oder durch ein es:inactive-Element deaktiviert wurde.</xs:documentation>
+        </xs:annotation>
         <xs:simpleType>
             <xs:restriction base="xs:string">
-                <xs:enumeration value="false"/>
-                <xs:enumeration value="true"/>
-                <xs:enumeration value="auto"/>
+                <xs:enumeration value="false">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="de">Wird das Pattern nicht durch ein sch:active-Element der aufgerufenen Phase aktiviert, ist er immer inaktiv.</xs:documentation>
+                    </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="true">
+                    <xs:annotation>
+                    <xs:documentation xml:lang="de">Wird das Pattern nicht durch ein es:inactive-Element der aufgerufenen Phase deaktiviert, ist er immer aktiv.</xs:documentation>
+                    </xs:annotation>
+                </xs:enumeration>
+                <xs:enumeration value="auto">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="de">Übliches Verhalten eines Patterns.</xs:documentation>
+                    </xs:annotation>
+                </xs:enumeration>
             </xs:restriction>
         </xs:simpleType>
     </xs:attribute>
@@ -80,20 +96,21 @@
     </xs:element>
     <xs:element name="import">
         <xs:annotation>
-            <xs:documentation>Using this element any content of another Schematron schema (<icode type="attribute">@href</icode>) will be imported. With <icode type="attribute">@phase</icode> just the patterns will be imported, who would be active for one of the given phases. Though the imported pattern is not activ automatically.</xs:documentation>
+            <xs:documentation>tbd</xs:documentation>
+            <!--<xs:documentation>Using this element any content of another Schematron schema (<icode type="attribute">@href</icode>) will be imported. With <icode type="attribute">@phase</icode> just the patterns will be imported, who would be active for one of the given phases. Though the imported pattern is not activ automatically.</xs:documentation>-->
             <xs:documentation xml:lang="de">Mit diesen Element können sämtliche Inhalte eines anderen Schematron-Schemas importiert werden. Mit @phase werden nur Patterns importiert, die bei einer der aufgelisteten Phasen aktiv wären. Das importierte Pattern ist jedoch nicht automatisch aktiv.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:attribute name="phase" use="optional" type="xs:NMTOKENS">
                 <xs:annotation>
-                    <xs:documentation>A list of phases which filters the imported patterns.</xs:documentation>
+<!--                    <xs:documentation>A list of phases which filters the imported patterns.</xs:documentation>-->
                     <xs:documentation source="Default">#ALL</xs:documentation>
                     <xs:documentation xml:lang="de"></xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="href" use="required" type="xs:anyURI">
                 <xs:annotation>
-                    <xs:documentation>Reference to another Schematron schema.</xs:documentation>
+<!--                    <xs:documentation>Reference to another Schematron schema.</xs:documentation>-->
                     <xs:documentation xml:lang="de"/>
                 </xs:annotation>
             </xs:attribute>
@@ -101,13 +118,14 @@
     </xs:element>
     <xs:element name="inactive">
         <xs:annotation>
-            <xs:documentation>Deactivate patterns for a phase. If there are just <icode type="element">es:inactive</icode> active elements for a phase, any other patterns is active except the deactivated patterns.</xs:documentation>
+            <xs:documentation>tbd</xs:documentation>
+            <!--<xs:documentation>Deactivate patterns for a phase. If there are just <icode type="element">es:inactive</icode> active elements for a phase, any other patterns is active except the deactivated patterns.</xs:documentation>-->
             <xs:documentation xml:lang="de">Deaktiviert Patterns für eine Phase. Gelten für eine Phase nur <icode type="element">es:inactive</icode>-Elemente, sind alle Patterns außer den deaktivierten Patterns aktiv.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:attribute name="pattern" use="required" type="xs:IDREF">
                 <xs:annotation>
-                    <xs:documentation>Reference to an ID of a pattern.</xs:documentation>
+                    <!--<xs:documentation>Reference to an ID of a pattern.</xs:documentation>-->
                     <xs:documentation xml:lang="de"/>
                 </xs:annotation>
             </xs:attribute>
@@ -115,13 +133,51 @@
     </xs:element>
     <xs:element name="phase">
         <xs:annotation>
-            <xs:documentation xml:lang="de"></xs:documentation>
+            <xs:documentation>tbd</xs:documentation>
+            <xs:documentation xml:lang="de">Referenziert von einer Phase aus auf eine andere Phase. Alle Patterns der referenzierten Phase gehören gleichwertig auch zu der referenzierenden Phase.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:attribute name="ref" use="required" type="xs:IDREF">
+            <xs:attribute name="ref" use="required" type="xs:string">
                 <xs:annotation>
-                    <xs:documentation xml:lang="de"/>
+                    <xs:documentation xml:lang="de">Referenz auf eine ID einer anderen Phase.</xs:documentation>
                 </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="param">
+        <xs:annotation>
+            <xs:documentation>tbd</xs:documentation>
+            <xs:documentation xml:lang="de">Dient zur Definition eines Parameters für die Schematron-Validierung. Der Parameter kann innerhalb des Schematron-Schemas wie eine Variable verwendet werden. Es darf keine globale Variable mit dem gleichen Namen definiert worden sein. Die Attribute und der Inhalt sind identisch zu XSLT 2.0 zu implementieren. Der Parameterwert kann bei der Validierung &#x2013; genauer beim Aufruf des Validator-Stylesheets &#x2013; festgelegt werden.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:QName">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">Umsetzung wie bei xsl:param/@name in XSLT 2.0.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="select" use="optional" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">Umsetzung wie bei xsl:param/@select in XSLT 2.0.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="type" use="optional" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">Umsetzung wie bei xsl:param/@type in XSLT 2.0.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="required" use="optional">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">Umsetzung wie bei xsl:param/@required in XSLT 2.0.</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="yes"/>
+                        <xs:enumeration value="no"/>
+                    </xs:restriction>
+                </xs:simpleType>
             </xs:attribute>
         </xs:complexType>
     </xs:element>

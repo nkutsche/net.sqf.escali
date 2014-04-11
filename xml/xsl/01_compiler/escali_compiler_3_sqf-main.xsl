@@ -43,7 +43,7 @@
         </xd:desc>
     </xd:doc>
     
-    <xsl:param name="sqf:changePrefix" select="'sqfc'"/>
+    <xsl:param name="sqf:changePrefix" select="'sqfc'" as="xs:string"/>
     <xsl:param name="sqf:useSQF" select="exists(key('sqfelementsBySQF', 'SQF'))" as="xs:boolean"/>
     <xsl:key name="sqfelementsBySQF" match="sqf:*" use="'SQF'"/>
     <xsl:namespace-alias stylesheet-prefix="bxsl" result-prefix="axsl"/>
