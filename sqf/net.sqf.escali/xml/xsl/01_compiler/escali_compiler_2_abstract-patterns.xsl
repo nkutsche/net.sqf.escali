@@ -60,12 +60,21 @@
     <xsl:namespace-alias stylesheet-prefix="axsl" result-prefix="xsl"/>
 
     <xsl:key name="abstractById" match="*[@abstract='true']" use="@id"/>
-
+    
+    <xsl:template match="sch:schema">
+        <xsl:for-each-group select="sch:ns" group-by="@prefix">
+            <xsl:if test="count(current-group()) > 1 and count(distinct-values(current-group()/@uri)) > 1">
+                <xsl:message terminate="yes">The prefix <xsl:value-of select="current-grouping-key()"/> is multiple defined by sch:ns elements.</xsl:message>
+            </xsl:if>
+        </xsl:for-each-group>
+        <xsl:next-match/>
+    </xsl:template>
+    
     <!--  
         Handling a pattern call
     -->
     <xsl:template match="sch:pattern[@is-a]">
-        <xsl:variable name="sx-id" select="@es:id"/>
+        <xsl:variable name="es-id" select="@es:id"/>
         <xsl:variable name="template" select="key('abstractById', @is-a)"/>
         <xsl:choose>
             <xsl:when test="not($template)">
@@ -75,7 +84,7 @@
             <xsl:otherwise>
                 <xsl:apply-templates select="$template" mode="resolvePattern">
                     <xsl:with-param name="id" select="@id"/>
-                    <xsl:with-param name="sx-id" select="$sx-id"/>
+                    <xsl:with-param name="es-id" select="$es-id"/>
                     <xsl:with-param name="params" select="sch:param"/>
                 </xsl:apply-templates>
             </xsl:otherwise>
@@ -91,14 +100,14 @@
     -->
     <xsl:template match="sch:pattern[@abstract='true']" mode="resolvePattern">
         <xsl:param name="id"/>
-        <xsl:param name="sx-id"/>
+        <xsl:param name="es-id"/>
         <xsl:param name="params"/>
         <xsl:copy>
             <xsl:apply-templates select="@* except @abstract" mode="resolvePattern">
                 <xsl:with-param name="params" select="$params"/>
             </xsl:apply-templates>
             <xsl:attribute name="es:is-a" select="@id"/>
-            <xsl:attribute name="es:id" select="$sx-id"/>
+            <xsl:attribute name="es:id" select="$es-id"/>
             <xsl:attribute name="id" select="$id"/>
             <xsl:apply-templates select="node()" mode="resolvePattern">
                 <xsl:with-param name="params" select="$params" tunnel="yes"/>
@@ -176,7 +185,7 @@
     <xsl:template match="sch:rule[@abstract='true']"/>
 
     <!--    
-        sx extension:
+        es extension:
         concern asserts / reports which contains no message (after the es:lang filter):
         if they refer to exactly one diagnostic
         the message of the diagnostic will be used as the message of the assert / report

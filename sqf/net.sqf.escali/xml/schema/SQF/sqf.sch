@@ -81,7 +81,7 @@
     <xsl:function name="sqf:getLang" as="xs:string">
         <xsl:param name="node" as="node()"/>
         <xsl:variable name="lang" select="($node/ancestor-or-self::*/@xml:lang)[last()]"/>
-        <xsl:value-of select="if ($lang) then ($lang) else ('#default')"/>
+        <xsl:value-of select="if ($lang) then ($lang) else ('#DEFAULT')"/>
     </xsl:function>
     <pattern sqf:matchType="all">
         <let name="root" value="/"/>

@@ -56,7 +56,7 @@
         1. the $phase is '#ALL' 
             or $pattern is abstract or
         2. the $phase contains not the $deactivatePhase 
-            and the $phaseEl contains not sch:active (sx extension) or
+            and the $phaseEl contains not sch:active (es extension) or
         3. the $pattern has an @id and a $callingPhase which contains the $phase
    otherwise the $pattern is inactive
 
@@ -70,24 +70,34 @@
         <xsl:variable name="deactivatePhase" select="key('phaseByInactivePatternId',$pattern/@id, root($pattern))"/>
         <xsl:choose>
             <xsl:when test="$phase = '#ALL' or $pattern/@abstract='true'">
-                <xsl:sequence select="true()"/>
+                <xsl:sequence select="es:getActiveDefault($pattern, true())"/>
             </xsl:when>
             <xsl:when test="$deactivatePhase/@id = $phase">
                 <xsl:sequence select="false()"/>
             </xsl:when>
             <xsl:when test="$phaseEl and not($phaseEl/sch:active)">
-                <xsl:sequence select="true()"/>
+                <xsl:sequence select="es:getActiveDefault($pattern, true())"/>
             </xsl:when>
             <xsl:when test="not($pattern/@id) or not($callingPhase)">
-                <xsl:sequence select="false()"/>
+                <xsl:sequence select="es:getActiveDefault($pattern, false())"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:sequence select="$callingPhase/@id = $phase"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
+    
+    <xsl:function name="es:getActiveDefault" as="xs:boolean">
+        <xsl:param name="pattern" as="element()"/>
+        <xsl:param name="default" as="xs:boolean"/>
+        <xsl:sequence select="if ($pattern/@abstract='true') 
+                            then (true()) 
+                         else if ($pattern/@es:active[.!='auto']) 
+                            then ($pattern/@es:active = 'true') 
+                            else ($default)"></xsl:sequence>
+    </xsl:function>
 <!--  
-        sx extension:
+        es extension:
         resolves references from phases to other phases
         respects the es:phase elements (with @ref) as childs of sch:phase
     -->

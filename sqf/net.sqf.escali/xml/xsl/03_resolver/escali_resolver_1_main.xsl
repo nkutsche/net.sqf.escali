@@ -45,7 +45,7 @@
     
     <xsl:include href="escali_resolver_1_get-record.xsl"/>
     
-    <xsl:param name="id"/>
+    <xsl:param name="id" as="xs:string+" select="''"/>
     <xsl:param name="inputRecord" as="xs:string" select="''"/>
     <xsl:param name="outputRecord" as="xs:string" select="''"/>
     <xsl:param name="additionalTypes" select="()"/>

@@ -52,6 +52,7 @@
             <p:pipe port="schema" step="main-escali-validation"/>
         </p:input>
         <p:with-option name="phase" select="$phase"/>
+        <p:with-param name="dummy" select="''"/>
     </es:schematron>
     
     <p:xslt name="html">

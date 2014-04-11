@@ -48,12 +48,12 @@
 	   Escali preprocess 1
 	   Schematron:
 	       includes
-	       phases
 	       @role
 	       IDs
 	       URIs
 	       
 	   es extensions:
+	       import
 	       phases -> inactive
 	       languages
 	       @icon, @is-a, @see, sch:p/@class
@@ -63,10 +63,10 @@
     <!--
         Extension parameter es:lang:
         all sch:diagnostic, sch:assert, sch:report and sch:p could have @xml:lang
-        if they have other @xml:lang values than $es:lang, they will be hidden
+        if they have other @xml:lang values than $lang, they will be hidden
         
     -->
-    <xsl:param name="es:lang" select="if (/sch:schema/@xml:lang) then (/sch:schema/@xml:lang) else ('#ALL')" as="xs:string+"/>
+    <xsl:param name="es:lang" select="'#DEFAULT'" as="xs:string+"/>
     <xsl:param name="es:type-available" select="'true'"/>
     <!--  
         gives a list of posible values of the role element
@@ -75,7 +75,12 @@
     -->
     <xsl:param name="roles" select="('info|information','warn|warning','error','fatal')" as="xs:string*"/>
 
-
+    <xsl:variable name="lang" select=" if ($es:lang = '#DEFAULT') 
+                                     then ( if (/sch:schema/@xml:lang) 
+                                          then (/sch:schema/@xml:lang) 
+                                          else ('#ALL')) 
+                                     else ($es:lang)"/>
+    
     <!--
     returns the language value of a node
     it respects the inherited languages of the ancesors
@@ -83,17 +88,17 @@
     <xsl:function name="es:getLang" as="xs:string">
         <xsl:param name="node" as="node()"/>
         <xsl:variable name="lang" select="($node/ancestor-or-self::*/@xml:lang)[last()]"/>
-        <xsl:value-of select="if ($lang) then ($lang) else ('#default')"/>
+        <xsl:value-of select="if ($lang) then ($lang) else ('#DEFAULT')"/>
     </xsl:function>
 
     <xsl:key name="langnodesByLang" match="sch:diagnostic | sch:assert/node() | sch:report/node() | sch:p" use="(es:getLang(.), '#ALL')"/>
-    <xsl:key name="selectedNodesById" match="key('langnodesByLang', $es:lang)" use="generate-id()"/>
+    <xsl:key name="selectedNodesById" match="key('langnodesByLang', $lang)" use="generate-id()"/>
 
     <xsl:include href="escali_compiler_0_functions.xsl"/>
 
     <!--  
     deletes all child nodes of sch:assert and sch:report
-    if there lang value (es:getLang()) is not equal to the $es:lang
+    if there lang value (es:getLang()) is not equal to the $lang
     -->
     <xsl:template match="*[self::sch:assert | self::sch:report]/node()" priority="100">
         <xsl:choose>
@@ -106,7 +111,7 @@
 
     <!--  
     deletes all sch:diagnostic and sch:p
-    if there lang value (es:getLang()) is not equal to the $es:lang
+    if there lang value (es:getLang()) is not equal to the $lang
     -->
     <xsl:template match="sch:diagnostic | sch:p" priority="100">
         <xsl:choose>
@@ -114,7 +119,7 @@
                 <xsl:next-match/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:comment>Deleted because selected language <xsl:value-of select="$es:lang"/> != <xsl:value-of select="es:getLang(.)"/>.</xsl:comment>
+                <xsl:comment>Deleted because selected language <xsl:value-of select="$lang"/> != <xsl:value-of select="es:getLang(.)"/>.</xsl:comment>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -122,14 +127,15 @@
 
     <!--  
     it is an error if there are no sch:assert, sch:report, 
-    sch:p or sch:diagnostic which have the lang value of $es:lang
+    sch:p or sch:diagnostic which have the lang value of $lang
     -->
     <xsl:template match="sch:schema">
-        <xsl:if test="not(key('langnodesByLang', $es:lang))">
-            <xsl:message terminate="yes">There are no asserts, reports, diagnostics or paragraphs in this Schematron schema with the language <xsl:value-of select="$es:lang"/>!</xsl:message>
+        <xsl:if test="not(key('langnodesByLang', $lang))">
+            <xsl:message terminate="no">There are no asserts, reports, diagnostics or paragraphs in this Schematron schema with the language <xsl:value-of select="$lang"/>!</xsl:message>
         </xsl:if>
         <xsl:copy>
             <xsl:attribute name="es:uri" select="document-uri(/)"/>
+            <xsl:attribute name="es:lang" select="$lang" separator=","/>
             <xsl:apply-templates select="node() | @*"/>
         </xsl:copy>
     </xsl:template>
@@ -207,7 +213,7 @@
         </xsl:choose>
     </xsl:template>
     <!--
-        sx extension to allow better imports
+        es extension to allow better imports
         import other schematron schemas
         use @phase to include just patterns from this phase
     -->
@@ -234,7 +240,7 @@
     </xsl:template>
 
     <!--  
-        sx extension to allow better imports
+        es extension to allow better imports
         import all patterns from other schematron schemas
     -->
     <xsl:template match="es:import[not(@phase)]">
@@ -274,8 +280,8 @@
     </xsl:template>
 
     <!--
-    sx extension:
-    copies unsupported attributes into the sx namespace
+    es extension:
+    copies unsupported attributes into the es namespace
     -->
     <xsl:template match="@icon" mode="#all">
         <xsl:attribute name="es:{name()}" select="resolve-uri(.,document-uri(/))"/>

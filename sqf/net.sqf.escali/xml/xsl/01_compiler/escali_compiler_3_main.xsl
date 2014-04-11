@@ -63,12 +63,12 @@
     use sch:schema/@defaultPhase as default
     #ALL -> every pattern is active
     
-    sx extension:
+    es extension:
     it could be more than one phase active.
     -->
     <xsl:param name="phase" select=" if (/sch:schema/@defaultPhase) then (/sch:schema/@defaultPhase) else ('#ALL')" as="xs:string+"/>
 
-    <xsl:key name="elementBysxid" match="*[@es:id]" use="@es:id"/>
+    <xsl:key name="elementByesid" match="*[@es:id]" use="@es:id"/>
 
     <xsl:namespace-alias stylesheet-prefix="axsl" result-prefix="xsl"/>
 
@@ -103,24 +103,19 @@
             <xsl:call-template name="topLevelValidatorExtension"/>
             <axsl:template match="/">
                 <svrl:schematron-output xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:svrl="http://purl.oclc.org/dsdl/svrl">
-                    <xsl:if test="//sch:title">
-                        <xsl:attribute name="title" select="(//sch:title)[1]//text()"/>
+                    <xsl:if test="sch:title">
+                        <xsl:attribute name="title" select="sch:title" separator=", "/>
                     </xsl:if>
                     <xsl:attribute name="phase" select="$phase"/>
                     <xsl:copy-of select="@schemaVersion | @es:link | @es:icon"/>
                     <xsl:call-template name="topLevelManipulatorExtension"/>
-                    <xsl:variable name="rootNamespaces">
-                        <xsl:for-each select="/*/namespace::*[not(.=$processingNamespaces)]">
-                            <sch:ns prefix="{name()}" uri="{.}"/>
-                        </xsl:for-each>
-                    </xsl:variable>
-                    <xsl:for-each-group select="/sch:schema/sch:ns | $rootNamespaces/sch:ns" group-by="@uri">
-                        <svrl:ns-prefix-in-attribute-values uri="{current-grouping-key()}">
-                            <xsl:attribute name="prefix" select="distinct-values(current-group()/@prefix)" separator=" "/>
+                    <xsl:for-each-group select="/sch:schema/sch:ns" group-by="concat(@uri, @prefix)">
+                        <svrl:ns-prefix-in-attribute-values uri="{@uri}" prefix="{@prefix}">
+<!--                            <xsl:attribute name="prefix" select="distinct-values(current-group()/@prefix)" separator=" "/>-->
                         </svrl:ns-prefix-in-attribute-values>
                     </xsl:for-each-group>
                     <xsl:for-each select="sch:p | sch:pattern/sch:p">
-                        <xsl:variable name="refElement" select="key('elementBysxid', @es:ref)"/>
+                        <xsl:variable name="refElement" select="key('elementByesid', @es:ref)"/>
                         <xsl:choose>
                             <xsl:when test="$refElement/self::sch:pattern and not(es:isActive($refElement, $phase))"/>
                             <xsl:otherwise>
@@ -135,6 +130,9 @@
                         <xsl:if test="es:isActive(., $phase)">
                             <svrl:active-pattern>
                                 <xsl:copy-of select="@id | @role | @es:icon | @es:link | @es:is-a | @es:id"/>
+                                <xsl:if test="sch:title">
+                                    <xsl:attribute name="name" select="sch:title"/>
+                                </xsl:if>
                                 <xsl:attribute name="es:patternId" select="@es:id"/>
                             </svrl:active-pattern>
                         </xsl:if>
@@ -143,6 +141,16 @@
                 </svrl:schematron-output>
             </axsl:template>
             <xsl:apply-templates select="node() except es:default-namespace"/>
+            
+            <xsl:variable name="sep">', '</xsl:variable>
+            <axsl:function name="es:getPhase" as="xs:string+">
+                <axsl:sequence select="('{string-join($phase, $sep)}')"></axsl:sequence>
+            </axsl:function>
+            
+            <axsl:function name="es:getLang" as="xs:string+">
+                <xsl:variable name="langs" select="tokenize(/*/@es:lang, ',')" as="xs:string+"/>
+                <axsl:sequence select="('{string-join($langs, $sep)}')"></axsl:sequence>
+            </axsl:function>
             <!-- 
         copies all nodes in the validator
     -->
@@ -155,6 +163,7 @@
             <axsl:template match="text()"/>
         </axsl:stylesheet>
     </xsl:template>
+    
 
     <xsl:template match="sch:title"/>
 
@@ -322,6 +331,17 @@
         <xsl:copy/>
     </xsl:template>
 
+    <xsl:template match="es:param">
+        <axsl:param>
+            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="node()"/>
+        </axsl:param>
+    </xsl:template>
+    
+    <xsl:template match="@*" priority="-10">
+        <xsl:copy/>
+    </xsl:template>
+    
     <xsl:template match="*[namespace-uri()='http://www.w3.org/1999/XSL/Transform']" priority="-5">
         <xsl:copy>
             <xsl:copy-of select="@*"/>

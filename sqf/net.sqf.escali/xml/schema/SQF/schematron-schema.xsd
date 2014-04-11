@@ -40,6 +40,7 @@
                     <xs:group ref="sch:foreign"/>
                     <xs:element ref="sch:include"/>
                     <xs:element ref="es:import"/>
+                    <xs:element ref="es:param"/>
                     <xs:choice>
                         <xs:element ref="sch:title"/>
                         <xs:element ref="sch:ns"/>

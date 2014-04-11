@@ -32,7 +32,7 @@
     <xs:element name="schematron-output">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="sqf:topLevel"/>
+                <xs:element ref="sqf:topLevel" minOccurs="0"/>
                 <xs:element ref="svrl:ns-prefix-in-attribute-values" minOccurs="0" maxOccurs="unbounded"/>
                 
                 <xs:choice minOccurs="0" maxOccurs="unbounded">

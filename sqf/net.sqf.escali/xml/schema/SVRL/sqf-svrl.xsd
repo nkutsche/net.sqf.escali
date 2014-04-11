@@ -109,6 +109,7 @@
                     </xs:restriction>
                 </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="default" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
 
