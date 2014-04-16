@@ -67,6 +67,8 @@
     it could be more than one phase active.
     -->
     <xsl:param name="phase" select=" if (/sch:schema/@defaultPhase) then (/sch:schema/@defaultPhase) else ('#ALL')" as="xs:string+"/>
+    
+    <xsl:param name="useSaxonNextInChain" select="false()"/>
 
     <xsl:key name="elementByesid" match="*[@es:id]" use="@es:id"/>
 
@@ -98,7 +100,17 @@
             <xsl:apply-templates select="/sch:schema/es:default-namespace"/>
             <xsl:namespace name="xs" select="'http://www.w3.org/2001/XMLSchema'"/>
             <xsl:call-template name="namespace"/>
-            <axsl:output method="xml" indent="yes"/>
+            <xsl:choose>
+                <xsl:when test="$useSaxonNextInChain">
+                    <axsl:output method="xml" indent="yes" xmlns:saxon="http://saxon.sf.net/" saxon:next-in-chain="{resolve-uri('../02_validator/escali_validator_2_sqf-postprocess.xsl')}"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <axsl:output method="xml" indent="yes"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            
+            
+            
             <axsl:include href="{resolve-uri('escali_compiler_0_functions.xsl')}"/>
             <xsl:call-template name="topLevelValidatorExtension"/>
             <axsl:template match="/">
