@@ -30,7 +30,7 @@ then
 out=$(readlink -f $3);
 fi
 
-config=$escali_dir/META-INF/config-sh.xml
+config=$escali_dir/META-INF/config.xml
 html=$escali_dir/temp/report.html
 
 user_entry=${4-yes}

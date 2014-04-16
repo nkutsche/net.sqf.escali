@@ -101,7 +101,7 @@
         </p:when>
         <p:otherwise>
             <p:store>
-                <p:with-option name="href" select="$tempOutput"/>
+                <p:with-option name="href" select="concat($tempFolder, 'tempOutput.xml')"/>
             </p:store>
         </p:otherwise>
     </p:choose>
