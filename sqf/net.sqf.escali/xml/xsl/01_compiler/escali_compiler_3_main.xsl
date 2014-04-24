@@ -28,7 +28,7 @@
             <xd:p><xd:b>Author:</xd:b> Nico Kutscherauer</xd:p>
         </xd:desc>
     </xd:doc>
-    
+
     <xd:doc scope="version">
         <xd:desc>
             <xd:p>Version information</xd:p>
@@ -44,8 +44,8 @@
             </xd:ul>
         </xd:desc>
     </xd:doc>
-    
-    
+
+
     <!--
         Escali Schematron main process
         
@@ -67,8 +67,7 @@
     it could be more than one phase active.
     -->
     <xsl:param name="phase" select=" if (/sch:schema/@defaultPhase) then (/sch:schema/@defaultPhase) else ('#ALL')" as="xs:string+"/>
-    
-    <xsl:param name="useSaxonNextInChain" select="false()"/>
+
 
     <xsl:key name="elementByesid" match="*[@es:id]" use="@es:id"/>
 
@@ -97,20 +96,18 @@
 
     <xsl:template match="sch:schema">
         <axsl:stylesheet version="2.0">
-            <xsl:apply-templates select="/sch:schema/es:default-namespace"/>
+            <xsl:variable name="defaultNS" select="/sch:schema/es:default-namespace"/>
+            <xsl:variable name="imports" select="/sch:schema/xsl:import"/>
+            <xsl:variable name="firsts" select="($defaultNS, $imports)"/>
+            <xsl:apply-templates select="$defaultNS"/>
             <xsl:namespace name="xs" select="'http://www.w3.org/2001/XMLSchema'"/>
             <xsl:call-template name="namespace"/>
-            <xsl:choose>
-                <xsl:when test="$useSaxonNextInChain">
-                    <axsl:output method="xml" indent="yes" xmlns:saxon="http://saxon.sf.net/" saxon:next-in-chain="{resolve-uri('../02_validator/escali_validator_2_sqf-postprocess.xsl')}"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <axsl:output method="xml" indent="yes"/>
-                </xsl:otherwise>
-            </xsl:choose>
-            
-            
-            
+
+            <xsl:apply-templates select="$imports"/>
+
+            <axsl:output method="xml" indent="yes"/>
+
+
             <axsl:include href="{resolve-uri('escali_compiler_0_functions.xsl')}"/>
             <xsl:call-template name="topLevelValidatorExtension"/>
             <axsl:template match="/">
@@ -123,7 +120,7 @@
                     <xsl:call-template name="topLevelManipulatorExtension"/>
                     <xsl:for-each-group select="/sch:schema/sch:ns" group-by="concat(@uri, @prefix)">
                         <svrl:ns-prefix-in-attribute-values uri="{@uri}" prefix="{@prefix}">
-<!--                            <xsl:attribute name="prefix" select="distinct-values(current-group()/@prefix)" separator=" "/>-->
+                            <!--                            <xsl:attribute name="prefix" select="distinct-values(current-group()/@prefix)" separator=" "/>-->
                         </svrl:ns-prefix-in-attribute-values>
                     </xsl:for-each-group>
                     <xsl:for-each select="sch:p | sch:pattern/sch:p">
@@ -152,16 +149,16 @@
                     <axsl:apply-templates/>
                 </svrl:schematron-output>
             </axsl:template>
-            <xsl:apply-templates select="node() except es:default-namespace"/>
-            
+            <xsl:apply-templates select="node() except $firsts"/>
+
             <xsl:variable name="sep">', '</xsl:variable>
             <axsl:function name="es:getPhase" as="xs:string+">
-                <axsl:sequence select="('{string-join($phase, $sep)}')"></axsl:sequence>
+                <axsl:sequence select="('{string-join($phase, $sep)}')"/>
             </axsl:function>
-            
+
             <axsl:function name="es:getLang" as="xs:string+">
                 <xsl:variable name="langs" select="tokenize(/*/@es:lang, ',')" as="xs:string+"/>
-                <axsl:sequence select="('{string-join($langs, $sep)}')"></axsl:sequence>
+                <axsl:sequence select="('{string-join($langs, $sep)}')"/>
             </axsl:function>
             <!-- 
         copies all nodes in the validator
@@ -175,7 +172,7 @@
             <axsl:template match="text()"/>
         </axsl:stylesheet>
     </xsl:template>
-    
+
 
     <xsl:template match="sch:title"/>
 
@@ -206,7 +203,7 @@
                 </xsl:variable>
                 <xsl:variable name="precRules" select="$sortedRules/sch:rule[@es:id=$rule/@es:id]/preceding-sibling::sch:rule"/>
                 <xsl:value-of select="count($precRules) + count($non-priorities)"/>
-                
+
             </xsl:when>
             <xsl:otherwise>
                 <xsl:variable name="followingRules" select="$non-priorities[. >> $rule]"/>
@@ -349,11 +346,11 @@
             <xsl:apply-templates select="node()"/>
         </axsl:param>
     </xsl:template>
-    
+
     <xsl:template match="@*" priority="-10">
         <xsl:copy/>
     </xsl:template>
-    
+
     <xsl:template match="*[namespace-uri()='http://www.w3.org/1999/XSL/Transform']" priority="-5">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
