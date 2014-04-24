@@ -119,25 +119,25 @@
             <xsl:for-each select="$node/ancestor-or-self::node() except root($node)">
                 <xsl:choose>
                     <xsl:when test=". instance of attribute()">
-                        <xsl:call-template name="makeElementXPath">
+                        <xsl:call-template name="es:makeElementXPath">
                             <xsl:with-param name="axis">@</xsl:with-param>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:when test=". instance of element()">
-                        <xsl:call-template name="makeElementXPath"/>
+                        <xsl:call-template name="es:makeElementXPath"/>
                     </xsl:when>
                     <xsl:when test=". instance of text()">
-                        <xsl:call-template name="makeElementXPath">
+                        <xsl:call-template name="es:makeElementXPath">
                             <xsl:with-param name="type">text()</xsl:with-param>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:when test=". instance of comment()">
-                        <xsl:call-template name="makeElementXPath">
+                        <xsl:call-template name="es:makeElementXPath">
                             <xsl:with-param name="type">comment()</xsl:with-param>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:when test=". instance of processing-instruction()">
-                        <xsl:call-template name="makeElementXPath">
+                        <xsl:call-template name="es:makeElementXPath">
                             <xsl:with-param name="type">processing-instruction()</xsl:with-param>
                         </xsl:call-template>
                     </xsl:when>
@@ -147,7 +147,7 @@
         </xsl:variable>
         <xsl:value-of select="$ancestor"/>
     </xsl:function>
-    <xsl:template name="makeElementXPath">
+    <xsl:template name="es:makeElementXPath">
         <xsl:param name="axis" select="''"/>
         <xsl:param name="type">*</xsl:param>
         <xsl:variable name="name" select="name()"/>
