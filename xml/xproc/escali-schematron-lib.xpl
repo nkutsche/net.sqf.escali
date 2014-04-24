@@ -171,25 +171,20 @@
             <p:with-param name="fixId" select="$fixId"/>
         </p:xslt>
     </p:declare-step>
-    <p:declare-step type="es:schematron" name="es_schematron">
-        <p:input port="schema"/>
-        <p:input port="source" primary="true"/>
-        <p:input port="params" kind="parameter">
-            <p:empty/>
-        </p:input>
-        <p:output port="result" primary="true"/>
+    
+    <p:declare-step type="es:compile" name="es_compile">
+        <p:input port="schema" primary="true"/>
+        <p:output port="validator" primary="true"/>
+        
         <p:option name="phase" select="'#ALL'"/>
         <p:option name="lang" select="'#DEFAULT'"/>
         
         <p:validate-with-xml-schema>
-            <p:input port="source">
-                <p:pipe port="schema" step="es_schematron"/>
-            </p:input>
             <p:input port="schema">
                 <p:document href="../schema/SQF/schematron-schema.xsd"/>
             </p:input>
         </p:validate-with-xml-schema>
-
+        
         <p:xslt name="excali1">
             <p:input port="stylesheet">
                 <p:document href="../xsl/01_compiler/escali_compiler_1_include.xsl"/>
@@ -209,12 +204,29 @@
             </p:input>
             <p:with-param name="phase" select="$phase"/>
         </p:xslt>
+    </p:declare-step>
+    
+    <p:declare-step type="es:schematron" name="es_schematron">
+        <p:input port="schema"/>
+        <p:input port="source" primary="true"/>
+        <p:input port="params" kind="parameter">
+            <p:empty/>
+        </p:input>
+        <p:output port="result" primary="true"/>
+        <p:option name="phase" select="'#ALL'"/>
+        <p:option name="lang" select="'#DEFAULT'"/>
+        
+        <es:compile name="compiled">
+            <p:with-option name="phase" select="$phase"/>
+            <p:with-option name="lang" select="$lang"/>
+        </es:compile>
+        
         <p:xslt>
             <p:input port="source">
                 <p:pipe port="source" step="es_schematron"/>
             </p:input>
             <p:input port="stylesheet">
-                <p:pipe port="result" step="excali3"/>
+                <p:pipe port="validator" step="compiled"/>
             </p:input>
             <p:input port="parameters">
                 <p:pipe port="params" step="es_schematron"/>
