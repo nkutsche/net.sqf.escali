@@ -14,9 +14,10 @@
     
     <xs:annotation>
         <xs:appinfo source="sqf:meta">
-            <meta>
+            <meta keywords="SVRL, SQF changes in SVRL, SVRL extension, SVRL extension reference, QuickFixes in SVRL">
                 <title>Schematron QuickFix &#x2013; SVRL reference</title>
                 <navTitle idx="5" subMenuLevel="4">SVRL reference</navTitle>
+                <description>A documenation of the extension of the Schematron Validation Report Language (SVRL) for Schematron QuickFix.</description>
             </meta>
             <title>SVRL SQF/extension reference</title>
         </xs:appinfo>

@@ -23,7 +23,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="http://www.escali.schematron-quickfix.com/" xmlns:es="http://www.escali.schematron-quickfix.com/" xml:lang="en">
     <xs:annotation>
         <xs:appinfo source="sqf:meta">
-            <title>Escalie SVRL extensions</title>
+            <title>Escali SVRL extensions</title>
         </xs:appinfo>
         <xs:appinfo source="sqf:meta" xml:lang="de">
             <title>Escali SVRL-Erweiterungen</title>
