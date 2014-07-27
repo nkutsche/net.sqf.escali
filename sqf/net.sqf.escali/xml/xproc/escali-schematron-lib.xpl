@@ -219,6 +219,9 @@
         <es:compile name="compiled">
             <p:with-option name="phase" select="$phase"/>
             <p:with-option name="lang" select="$lang"/>
+            <p:input port="schema">
+                <p:pipe port="schema" step="es_schematron"/>
+            </p:input>
         </es:compile>
         
         <p:xslt>

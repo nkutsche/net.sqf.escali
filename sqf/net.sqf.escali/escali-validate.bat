@@ -1,3 +1,5 @@
+REM @echo off
+
 REM 	Copyright (c) 2014 Nico Kutscherauer
 	
 REM 	This file is part of Escali Schematron.
@@ -16,7 +18,7 @@ REM 	You should have received a copy of the GNU General Public License
 REM 	along with Escali Schematron.  If not, see http://www.gnu.org/licenses/gpl-3.0.
 
 
-@echo off
+
 
 set CALL_DIR=%CD%
 set ESCALI_DIR=%~dp0
@@ -26,8 +28,8 @@ set SCHEMA=%~f2
 
 set CALABASH=%ESCALI_DIR%lib\calabash\
 set OUT=%~f3
-set CONFIG=%ESCALI_DIR%\META-INF\config.xml
-set HTML=%ESCALI_DIR%\temp\report.html
+set CONFIG=%ESCALI_DIR%META-INF\config.xml
+set HTML=%ESCALI_DIR%temp\report.html
 
 set USER_ENTRY=%4
 
@@ -79,7 +81,7 @@ echo.
 :fix
 java -cp "calabash.jar; lib/" com.xmlcalabash.drivers.Main --input config=%CONFIG% %ESCALI_DIR%xml\xproc\escali-quickFix.xpl fixId=%FIX_ID% userEntries=%ENTRIES%
 
-copy %ESCALI_DIR%\temp\tempOutput.xml %OUT%
+copy %ESCALI_DIR%temp\tempOutput.xml %OUT%
 
 :eop
 
