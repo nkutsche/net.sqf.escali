@@ -92,7 +92,7 @@
         <p:variable name="xsmFolder" select="resolve-uri(/es:config/es:output/es:xsm-processor, document-uri(/))">
             <p:pipe port="config" step="main-escali-quickFix"/>
         </p:variable>
-        <p:when test="$xml-save-mode='true' and $system='bat'">
+        <p:when test="$xml-save-mode='true'">
             <es:xsm>
                 <p:with-option name="tempFolder" select="$tempFolder"/>
                 <p:with-option name="xsmFolder" select="$xsmFolder"/>
