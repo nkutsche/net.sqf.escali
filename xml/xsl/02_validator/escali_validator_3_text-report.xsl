@@ -19,14 +19,14 @@
 
 -->
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" exclude-result-prefixes="xs xd svrl es" version="2.0">
-    
+
     <xd:doc scope="stylesheet">
         <xd:desc>
             <xd:p><xd:b>Created on:</xd:b> Nov 19, 2013</xd:p>
             <xd:p><xd:b>Author:</xd:b> Nico Kutscherauer</xd:p>
         </xd:desc>
     </xd:doc>
-    
+
     <xd:doc scope="version">
         <xd:desc>
             <xd:p>Version information</xd:p>
@@ -42,8 +42,8 @@
             </xd:ul>
         </xd:desc>
     </xd:doc>
-    
-    <xsl:output method="xhtml" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
+
+    <xsl:output method="text"/>
     <xsl:variable name="title">
         <xsl:value-of select=" if (/svrl:schematron-output/@title != '') 
                              then (/svrl:schematron-output/@title) 
@@ -55,7 +55,22 @@
 
 
     <xsl:template match="/">
-        <html>
+
+        <xsl:value-of select="$title"/>
+        <xsl:text>&#10;</xsl:text>
+
+        <xsl:text>Source document: </xsl:text>
+        <xsl:variable name="instance" select="/svrl:schematron-output/sqf:topLevel/@instance"/>
+        <xsl:value-of select="tokenize($instance, '/')[last()]"/>
+        <xsl:text>&#10;</xsl:text>
+
+        <xsl:text>Schematron schema: </xsl:text>
+        <xsl:variable name="schema" select="/svrl:schematron-output/sqf:topLevel/@schema"/>
+        <xsl:value-of select="tokenize($schema, '/')[last()]"/>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:apply-templates select="/svrl:schematron-output/svrl:*"/>
+        <!--<html>
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
                 <meta name="robots" content="noindex,follow"/>
@@ -73,27 +88,27 @@
                             <p/>
                         </div>
                     </a>
-                    <!--<div class="menu-links">
+                    <!-\-<div class="menu-links">
                         <div class="menu-button">
                             <a class="menu" href="#">Overview</a>
                         </div>
                         <xsl:for-each select="/svrl:schematron-output/svrl:active-pattern">
                             
                         </xsl:for-each>
-                        <!-\-<xsl:for-each select="/svrl:schematron-output/svrl:active-pattern">
+                        <!-\\-<xsl:for-each select="/svrl:schematron-output/svrl:active-pattern">
                             <div class="menu-button">
                                 <a class="menu" href="{@id}.html">
                                     <xsl:value-of select="@id"/>
                                 </a>
                             </div>
-                        </xsl:for-each>-\->
-                    </div>-->
-                </div>
-                <!--<div class="sub-menu">
-                    <!-\-<div class="menu-button">
-                        <a class="menu" href="about/team.html">Team</a>
+                        </xsl:for-each>-\\->
                     </div>-\->
-                </div>-->
+                </div>
+                <!-\-<div class="sub-menu">
+                    <!-\\-<div class="menu-button">
+                        <a class="menu" href="about/team.html">Team</a>
+                    </div>-\\->
+                </div>-\->
                 <div>
                     <div class="deco-hor" xml:space="preserve"><p/></div>
                     <div class="deco-ver" xml:space="preserve"><p/></div>
@@ -206,95 +221,82 @@
                     </div>
                 </div>
             </body>
-        </html>
+        </html>-->
     </xsl:template>
 
     <xsl:template match="svrl:failed-assert | svrl:successful-report">
-        <tr title="{@location}">
-            <th>
-                <p>
-                    <xsl:text>[</xsl:text>
-                    <xsl:value-of select="local-name()"/>
-                    <xsl:text>]</xsl:text>
-                </p>
-            </th>
-            <td colspan="3">
-                <p>
-                    <span class="icode-none">
-                        <xsl:value-of select="@test"/>
-                    </span>
-                </p>
-            </td>
-            <td>
-                <p>
-                    <xsl:apply-templates select="svrl:text"/>
-                </p>
-            </td>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:text>[</xsl:text>
+        <xsl:value-of select="local-name()"/>
+        <xsl:text>]</xsl:text>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:text>Test: </xsl:text>
+        <xsl:value-of select="@test"/>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:text>Location: </xsl:text>
+        <xsl:value-of select="@location"/>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:apply-templates select="svrl:text"/>
+        <xsl:if test="sqf:fix">
+            <xsl:variable name="maxIdLength" select="max(for $id in sqf:fix/@id return string-length($id))"/>
 
-        </tr>
-
-
-        <xsl:apply-templates select="sqf:fix"/>
-
-
+            <xsl:text>QuickFixes: </xsl:text>
+            <xsl:text>&#10;</xsl:text>
+            <xsl:text>   ID</xsl:text>
+            <xsl:value-of select="es:multipleChar(' ', $maxIdLength + 2)"/>
+            <xsl:text>MESSAGE</xsl:text>
+            <xsl:text>&#10;</xsl:text>
+            <xsl:apply-templates select="sqf:fix">
+                <xsl:with-param name="col2" select="$maxIdLength + 4"/>
+            </xsl:apply-templates>
+        </xsl:if>
     </xsl:template>
 
+    <xsl:function name="es:multipleChar" as="xs:string">
+        <xsl:param name="char" as="xs:string"/>
+        <xsl:param name="spaceCount" as="xs:integer"/>
+        <xsl:sequence select="string-join(for $i in 1 to $spaceCount return $char, '')"/>
+    </xsl:function>
+
     <xsl:template match="sqf:fix">
+        <xsl:param name="col2" as="xs:integer"/>
+        <xsl:text>   </xsl:text>
+        <xsl:value-of select="@id"/>
+        <xsl:value-of select="es:multipleChar(' ', $col2 - string-length(@id))"/>
+        <xsl:apply-templates select="sqf:description"/>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:if test="sqf:user-entry">
+            <xsl:variable name="maxIdLength" select="max(for $name in sqf:user-entry/sqf:param/@name return string-length($name))"/>
+            
+            <xsl:text>   UserEntries: </xsl:text>
+            <xsl:text>&#10;</xsl:text>
+            <xsl:text>      NAME</xsl:text>
+            <xsl:value-of select="es:multipleChar(' ', $maxIdLength + 2)"/>
+            <xsl:text>DESCRIPTION</xsl:text>
+            <xsl:text>&#10;</xsl:text>
+            <xsl:apply-templates select="sqf:user-entry">
+                <xsl:with-param name="col2" select="$maxIdLength + 6"/>
+            </xsl:apply-templates>
+            <xsl:text>&#10;</xsl:text>
+        </xsl:if>
+    </xsl:template>
 
-
-        <tr>
-            <th/>
-            <th>
-                <p>
-                    <xsl:text>[</xsl:text>
-                    <xsl:value-of select="local-name()"/>
-                    <xsl:text>]</xsl:text>
-                </p>
-            </th>
-            <td colspan="2">
-                <p>
-                    <span class="icode-none">
-                        <xsl:value-of select="@id"/>
-                    </span>
-                </p>
-            </td>
-            <td>
-                <xsl:apply-templates select="sqf:description"/>
-            </td>
-        </tr>
-
-
-        <xsl:apply-templates select="sqf:user-entry"/>
+    <xsl:template match="sqf:description">
+        <xsl:value-of select="svrl:text"/>
     </xsl:template>
 
     <xsl:template match="sqf:user-entry">
-        <tr>
-            <th/>
-            <th/>
-            <th>
-                <p>
-                    <xsl:text>[</xsl:text>
-                    <xsl:value-of select="local-name()"/>
-                    <xsl:text>]</xsl:text>
-                </p>
-            </th>
-            <td>
-                <p>
-                    <span class="icode-none">
-                        <xsl:value-of select="sqf:param/@name"/>
-                    </span>
-                </p>
-            </td>
-            <td>
-                <xsl:apply-templates select="sqf:description"/>
-            </td>
-        </tr>
+        <xsl:param name="col2"/>
+        <xsl:text>      </xsl:text>
+        <xsl:value-of select="sqf:param/@name"/>
+        <xsl:value-of select="es:multipleChar(' ', $col2 - string-length(sqf:param/@name))"/>
+        <xsl:apply-templates select="sqf:description"/>
     </xsl:template>
 
     <xsl:template match="svrl:text">
-        <p>
-            <xsl:value-of select="."/>
-        </p>
+        <xsl:text>Message: </xsl:text>
+        <xsl:value-of select="."/>
+        <xsl:text>&#10;</xsl:text>
     </xsl:template>
 
 </xsl:stylesheet>

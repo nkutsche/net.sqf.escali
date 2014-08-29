@@ -66,7 +66,6 @@
         if they have other @xml:lang values than $lang, they will be hidden
         
     -->
-    <xsl:param name="es:lang" select="'#DEFAULT'" as="xs:string+"/>
     <xsl:param name="es:type-available" select="'true'"/>
     <!--  
         gives a list of posible values of the role element
@@ -75,11 +74,9 @@
     -->
     <xsl:param name="roles" select="('info|information','warn|warning','error','fatal')" as="xs:string*"/>
 
-    <xsl:variable name="lang" select=" if ($es:lang = '#DEFAULT') 
-                                     then ( if (/sch:schema/@xml:lang) 
-                                          then (/sch:schema/@xml:lang) 
-                                          else ('#ALL')) 
-                                     else ($es:lang)"/>
+    <xsl:param name="es:lang" select="if (/sch:schema/@xml:lang) 
+                                       then (/sch:schema/@xml:lang) 
+                                       else ('#ALL')"/>
     
     <!--
     returns the language value of a node
@@ -88,11 +85,11 @@
     <xsl:function name="es:getLang" as="xs:string">
         <xsl:param name="node" as="node()"/>
         <xsl:variable name="lang" select="($node/ancestor-or-self::*/@xml:lang)[last()]"/>
-        <xsl:value-of select="if ($lang) then ($lang) else ('#DEFAULT')"/>
+        <xsl:value-of select="if ($lang) then ($lang) else ('#NULL')"/>
     </xsl:function>
 
     <xsl:key name="langnodesByLang" match="sch:diagnostic | sch:assert/node() | sch:report/node() | sch:p" use="(es:getLang(.), '#ALL')"/>
-    <xsl:key name="selectedNodesById" match="key('langnodesByLang', $lang)" use="generate-id()"/>
+    <xsl:key name="selectedNodesById" match="key('langnodesByLang', $es:lang)" use="generate-id()"/>
 
     <xsl:include href="escali_compiler_0_functions.xsl"/>
 
@@ -119,7 +116,7 @@
                 <xsl:next-match/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:comment>Deleted because selected language <xsl:value-of select="$lang"/> != <xsl:value-of select="es:getLang(.)"/>.</xsl:comment>
+                <xsl:comment>Deleted because selected language <xsl:value-of select="$es:lang"/> != <xsl:value-of select="es:getLang(.)"/>.</xsl:comment>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -130,12 +127,13 @@
     sch:p or sch:diagnostic which have the lang value of $lang
     -->
     <xsl:template match="sch:schema">
-        <xsl:if test="not(key('langnodesByLang', $lang))">
-            <xsl:message terminate="no">There are no asserts, reports, diagnostics or paragraphs in this Schematron schema with the language <xsl:value-of select="$lang"/>!</xsl:message>
+        <xsl:if test="not(key('langnodesByLang', $es:lang))">
+            <xsl:message terminate="no">There are no asserts, reports, diagnostics or paragraphs in this Schematron schema with the language <xsl:value-of select="$es:lang"/>!</xsl:message>
         </xsl:if>
         <xsl:copy>
             <xsl:attribute name="es:uri" select="document-uri(/)"/>
-            <xsl:attribute name="es:lang" select="$lang" separator=","/>
+            <xsl:attribute name="es:lang" select="$es:lang" separator=","/>
+            <xsl:attribute name="es:type-available" select="$es:type-available"/>
             <xsl:apply-templates select="node() | @*"/>
         </xsl:copy>
     </xsl:template>
@@ -162,8 +160,9 @@
     -->
     <xsl:template match="sch:pattern/sch:p">
         <xsl:variable name="rule" select="(following-sibling::sch:rule)[1]"/>
+        <xsl:variable name="refNode" select=" if ($rule) then ($rule) else (parent::sch:pattern)"/>
         <xsl:copy>
-            <xsl:attribute name="es:ref" select="generate-id($rule)"/>
+            <xsl:attribute name="es:ref" select="generate-id($refNode)"/>
             <xsl:apply-templates select="node() | @*"/>
         </xsl:copy>
     </xsl:template>
@@ -226,8 +225,9 @@
             <xsl:otherwise>
                 <xsl:variable name="doc" select="doc($docPath)" as="document-node()"/>
                 <xsl:variable name="phase" select="tokenize(@phase,'\s+')" as="xs:string+"/>
+                <xsl:variable name="phaseNodes" select="es:getRefPhases($doc/sch:schema/sch:phase[@id = $phase])"/>
                 <xsl:variable name="inActivePatterns" select="$doc/sch:schema/sch:pattern[not(es:isActive(., $phase))]"/>
-                <xsl:variable name="notToImport" select="$doc/sch:schema/sch:title"/>
+                <xsl:variable name="notToImport" select="$doc/sch:schema/(sch:title|sch:phase) except $phaseNodes"/>
                 <xsl:comment>
                     <xsl:text>Imported from document "</xsl:text>
                     <xsl:value-of select="$docPath"/>
@@ -251,7 +251,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:variable name="doc" select="doc($docPath)" as="document-node()"/>
-                <xsl:variable name="notToImport" select="$doc/sch:schema/(sch:phase|sch:title)"/>
+                <xsl:variable name="notToImport" select="$doc/sch:schema/sch:title"/>
                 <xsl:comment>
                     <xsl:text>Imported from document "</xsl:text>
                     <xsl:value-of select="$docPath"/>
