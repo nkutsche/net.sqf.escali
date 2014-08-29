@@ -113,6 +113,8 @@
     </xsl:function>
     
     
+    
+    
     <xsl:function name="es:getNodePath">
         <xsl:param name="node"/>
         <xsl:variable name="ancestor">
