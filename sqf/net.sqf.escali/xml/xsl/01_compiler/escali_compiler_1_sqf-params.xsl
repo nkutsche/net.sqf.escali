@@ -52,7 +52,7 @@
 	S Q F - E X T E N S I O N S
 -->
     <xsl:key name="sqfLangnodesByLang" match="sqf:p" use="(es:getLang(.), '#ALL')"/>
-    <xsl:key name="sqfSelectedNodesById" match="key('sqfLangnodesByLang', $lang)" use="generate-id()"/>
+    <xsl:key name="sqfSelectedNodesById" match="key('sqfLangnodesByLang', $es:lang)" use="generate-id()"/>
     
     
     <xsl:template match="sqf:p" priority="100">
@@ -61,7 +61,7 @@
                 <xsl:next-match/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:comment>Deleted because selected language <xsl:value-of select="$lang"/> != <xsl:value-of select="es:getLang(.)"/>.</xsl:comment>
+                <xsl:comment>Deleted because selected language <xsl:value-of select="$es:lang"/> != <xsl:value-of select="es:getLang(.)"/>.</xsl:comment>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

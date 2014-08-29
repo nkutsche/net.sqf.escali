@@ -45,6 +45,9 @@
     
     <xsl:param name="sqf:changePrefix" select="'sqfc'" as="xs:string"/>
     <xsl:param name="sqf:useSQF" select="exists(key('sqfelementsBySQF', 'SQF'))" as="xs:boolean"/>
+    
+    <xsl:variable name="es:type-available" select="/sch:schema/@es:type-available = 'true'" as="xs:boolean"/>
+    
     <xsl:key name="sqfelementsBySQF" match="sqf:*" use="'SQF'"/>
     <xsl:namespace-alias stylesheet-prefix="bxsl" result-prefix="axsl"/>
 
@@ -123,10 +126,19 @@
                 <bxsl:stylesheet version="2.0">
                     <xsl:apply-templates select="/sch:schema/es:default-namespace"/>
                     <bxsl:include href="{resolve-uri('escali_compiler_0_functions.xsl')}"/>
-                    <bxsl:param name="xsm:xml-save-mode" select="'true'"/>
+                        <xsl:choose>
+                            <xsl:when test="$es:type-available">
+                                <bxsl:param name="xsm:xml-save-mode" select="true()" as="xs:boolean"/>
+                                <bxsl:variable name="xsm:xml-save-mode-bool" select="$xsm:xml-save-mode" as="xs:boolean"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <bxsl:param name="xsm:xml-save-mode" select="'true'" as="xs:boolean"/>
+                                <bxsl:variable name="xsm:xml-save-mode-bool" select="$xsm:xml-save-mode = 'true'" as="xs:boolean"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     <bxsl:template match="/">
                         <bxsl:choose>
-                            <bxsl:when test="$xsm:xml-save-mode = 'true'">
+                            <bxsl:when test="$xsm:xml-save-mode-bool">
                                 <xsm:manipulator>
                                     <axsl:attribute name="document" select="document-uri(/)"/>
                                     <bxsl:apply-templates select="node()">

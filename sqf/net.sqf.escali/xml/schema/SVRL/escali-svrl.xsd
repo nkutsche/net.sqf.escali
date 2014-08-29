@@ -32,11 +32,11 @@
     <xs:attribute name="ref" type="xs:string">
         <xs:annotation>
             <xs:documentation>Reference of a paragraph to a <icode type="element">svrl:active-pattern</icode> or <icode type="element">svrl:fired-rule</icode> element.</xs:documentation>
-            <xs:documentation source="Value">The value must correspond to the value of the <icode type="attribute">qvrl:id</icode> attribute of a <icode type="element">svrl:active-pattern</icode> or <icode type="element">svrl:fired-rule</icode> element.</xs:documentation>
+            <xs:documentation source="Value">The value must correspond to the value of the <icode type="attribute">es:id</icode> attribute of a <icode type="element">svrl:active-pattern</icode> or <icode type="element">svrl:fired-rule</icode> element.</xs:documentation>
             <xs:documentation source="Use">optional</xs:documentation>
             
             <xs:documentation xml:lang="de">Referenz eines Absatzes auf ein <icode type="element">svrl:active-pattern</icode> oder <icode type="element">svrl:fired-rule</icode>.</xs:documentation>
-            <xs:documentation xml:lang="de" source="Value">Der Wert muss mit dem Wert des <icode type="attribute">qvrl:id</icode>-Attributs eines <icode type="element">svrl:active-pattern</icode> oder <icode type="element">svrl:fired-rule</icode> Elementes übereinstimmen.</xs:documentation>
+            <xs:documentation xml:lang="de" source="Value">Der Wert muss mit dem Wert des <icode type="attribute">es:id</icode>-Attributs eines <icode type="element">svrl:active-pattern</icode> oder <icode type="element">svrl:fired-rule</icode> Elementes übereinstimmen.</xs:documentation>
             <xs:documentation source="Use" xml:lang="de">Optional</xs:documentation>
         </xs:annotation>
     </xs:attribute>
