@@ -177,7 +177,7 @@
         <p:output port="validator" primary="true"/>
         
         <p:option name="phase" select="'#ALL'"/>
-        <p:option name="lang" select="'#DEFAULT'"/>
+        <p:option name="lang" select="'#NULL'"/>
         
         <p:validate-with-xml-schema>
             <p:input port="schema">
@@ -214,7 +214,8 @@
         </p:input>
         <p:output port="result" primary="true"/>
         <p:option name="phase" select="'#ALL'"/>
-        <p:option name="lang" select="'#DEFAULT'"/>
+        <p:option name="lang" select="'#NULL'"/>
+        <p:option name="outputFormat" select="'svrl'"/>
         
         <es:compile name="compiled">
             <p:with-option name="phase" select="$phase"/>
@@ -235,7 +236,7 @@
                 <p:pipe port="params" step="es_schematron"/>
             </p:input>
         </p:xslt>
-        <p:xslt>
+        <p:xslt name="svrl">
             <p:input port="stylesheet">
                 <p:document href="../xsl/02_validator/escali_validator_2_postprocess.xsl"/>
             </p:input>
@@ -246,6 +247,25 @@
                 <p:document href="../schema/SVRL/svrl.xsd"/>
             </p:input>
         </p:validate-with-xml-schema>
+        <p:choose>
+            <p:when test="$outputFormat = 'html' or $outputFormat = 'escali'">
+                <p:load name="outputPrinter">
+                    <p:with-option name="href" select="concat('../xsl/02_validator/escali_validator_3_', $outputFormat, '-report.xsl')"/>
+                </p:load>
+                <p:xslt>
+                    <p:input port="source">
+                        <p:pipe port="result" step="svrl"/>
+                    </p:input>
+                    <p:input port="stylesheet">
+                        <p:pipe port="result" step="outputPrinter"/>
+                    </p:input>
+                    <p:with-param name="dummy" select="''"/>
+                </p:xslt>
+            </p:when>
+            <p:otherwise>
+                <p:identity/>
+            </p:otherwise>
+        </p:choose>
     </p:declare-step>
     <p:declare-step type="es:quickFix" name="es_quickFix">
         <p:input port="svrl" primary="true"/>
