@@ -127,7 +127,7 @@
     sch:p or sch:diagnostic which have the lang value of $lang
     -->
     <xsl:template match="sch:schema">
-        <xsl:if test="not(key('langnodesByLang', $es:lang))">
+        <xsl:if test="not(key('langnodesByLang', $es:lang)) and key('langnodesByLang', '#ALL')">
             <xsl:message terminate="no">There are no asserts, reports, diagnostics or paragraphs in this Schematron schema with the language <xsl:value-of select="$es:lang"/>!</xsl:message>
         </xsl:if>
         <xsl:copy>
