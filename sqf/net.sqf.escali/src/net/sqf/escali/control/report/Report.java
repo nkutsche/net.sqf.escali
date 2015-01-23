@@ -24,6 +24,7 @@ public class Report extends MessageGroup implements _Report {
 	private final File instance;
 	private final HashMap<String, ArrayList<_QuickFix>> fixByQuickFix = new HashMap<String, ArrayList<_QuickFix>>();
 	private final HashMap<String, ArrayList<_QuickFix>> fixByMessage = new HashMap<String, ArrayList<_QuickFix>>();
+	private final ArrayList<Exception> baseErrors = new ArrayList<Exception>();
 
 	public static ArrayList<Report> getSubsequence(ArrayList<_ModelNode> nodes) {
 		ArrayList<Report> subsequence = new ArrayList<Report>();
@@ -38,7 +39,6 @@ public class Report extends MessageGroup implements _Report {
 		return subsequence;
 	}
 	
-
 	protected Report(Node report, int svrlIdx, StringNode instance) throws DOMException, URISyntaxException,
 			XPathExpressionException {
 		super(report, svrlIdx);
@@ -167,4 +167,20 @@ public class Report extends MessageGroup implements _Report {
 		return this.instance;
 	}
 
+	@Override
+	public void addBaseError(Exception e) {
+		this.baseErrors.add(e);
+	}
+
+	@Override
+	public boolean hasBaseError() {
+		return this.baseErrors.size() > 0;
+	}
+
+	@Override
+	public ArrayList<Exception> getBaseErrors() {
+		return this.baseErrors;
+	}
+	
+	
 }

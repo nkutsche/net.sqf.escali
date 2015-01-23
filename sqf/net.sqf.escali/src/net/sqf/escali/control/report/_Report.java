@@ -14,5 +14,12 @@ public interface _Report extends _MessageGroup {
 	public abstract File getSchema();
 
 	public abstract File getInstance();
+	
+	public abstract void addBaseError(Exception e);
+	
+	public abstract boolean hasBaseError();
+	
+	public abstract ArrayList<Exception> getBaseErrors();
+	
 
 }

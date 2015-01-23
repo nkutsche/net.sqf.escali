@@ -17,7 +17,7 @@ import net.sqf.xmlUtils.xpath.XPathReader;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
 
 public class SchemaInfo {
-	private XSLTPipe infoGenerator = new XSLTPipe();
+	private XSLTPipe infoGenerator = new XSLTPipe("Schema anlayzer");
 	private static XPathReader xpr = new XPathReader();
 	
 	

@@ -10,6 +10,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import net.sqf.escali.control.SVRLReport;
 import net.sqf.xmlUtils.parser.PositionalXMLHandler;
+import net.sqf.xmlUtils.staxParser.NodeInfo;
 import net.sqf.xmlUtils.staxParser.PositionalXMLReader;
 import net.sqf.xmlUtils.staxParser.StringNode;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
@@ -97,6 +98,9 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 			this.flag = ModelNodeFac.nodeFac.getFlag(flagNode);
 			flag.addChild(this);
 		}
+		
+		
+		this.setName(this.getName());
 	}
 
 
@@ -122,6 +126,12 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 		ArrayList<_ModelNode> children = this.getChildren();
 		ArrayList<_QuickFix> fixes = QuickFix.getSubsequence(children);
 		return fixes.toArray(new _QuickFix[fixes.size()]);
+	}
+	
+	@Override
+	public _QuickFix getQuickFix(String fixId) {
+		ArrayList<_QuickFix> fixList = QuickFix.getSubsequence(this.getChildById(new String[]{fixId}));
+		return fixList.get(0);
 	}
 
 
@@ -154,21 +164,8 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 	}
 	
 	@Override
-	public Location[] getLocationInIstance() throws XPathExpressionException{
-		Node node = this.instance.getNode(this.getLocation());
-		Location start = (Location) node.getUserData(PositionalXMLReader.NODE_LOCATION_START);
-		String endKey;
-		switch (node.getNodeType()) {
-		case Node.ELEMENT_NODE:
-			endKey = PositionalXMLReader.NODE_INNER_LOCATION_START;
-			break;
-
-		default:
-			endKey = PositionalXMLReader.NODE_LOCATION_END;
-			break;
-		}
-		Location end = (Location) node.getUserData(endKey);
-		return new Location[]{start, end};
+	public NodeInfo getLocationInIstance() throws XPathExpressionException{
+		return this.instance.getNodeInfo(this.getLocation());
 	}
 
 	@Override
@@ -228,4 +225,13 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 	}
 
 
+	
+	@Override
+	public String toString() {
+		try {
+			return this.getLocationInIstance().getStart().getLineNumber() + ": " + this.getName();
+		} catch (XPathExpressionException e) {
+			return this.getName();
+		}
+	}
 }

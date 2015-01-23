@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import javax.xml.stream.Location;
 import javax.xml.xpath.XPathExpressionException;
 
+import net.sqf.xmlUtils.staxParser.NodeInfo;
+
 public interface _SVRLMessage extends _ModelNode {
 	public static final int TYPE_REPORT = 0;
 	public static final int TYPE_ASSERT = 1;
@@ -29,6 +31,7 @@ public interface _SVRLMessage extends _ModelNode {
 	String getLocation();
 	boolean hasQuickFixes();
 	boolean hasDefaultFix();
-	Location[] getLocationInIstance() throws XPathExpressionException;
+	NodeInfo getLocationInIstance() throws XPathExpressionException;
 	File getInstanceFile();
+	_QuickFix getQuickFix(String fixId);
 }

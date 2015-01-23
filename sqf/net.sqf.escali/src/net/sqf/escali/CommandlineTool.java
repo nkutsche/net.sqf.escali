@@ -14,9 +14,14 @@ import javax.xml.xpath.XPathExpressionException;
 
 import net.sqf.escali.cmdGui.Menus;
 import net.sqf.escali.control.Escali;
+import net.sqf.escali.control.EscaliReceiver;
 import net.sqf.escali.control.SVRLReport;
+import net.sqf.escali.control.SchemaInfo;
 import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.stringUtils.TextSource;
+import net.sqf.utils.process.exceptions.CancelException;
+import net.sqf.utils.process.log.DefaultProcessLoger;
+import net.sqf.utils.process.log.ProcessLoger;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -42,11 +47,12 @@ public class CommandlineTool {
 
 	private Scanner cmdInput = new Scanner(System.in);
 	
-	public void start(File input, File schema, File outFile, File config) throws XPathExpressionException, IOException, SAXException, XMLStreamException, TransformerException, URISyntaxException{
+	
+	public void start(File input, File schema, File outFile, File config) throws XPathExpressionException, IOException, SAXException, XMLStreamException, TransformerException, URISyntaxException, CancelException{
 		this.input = input;
 		this.outFile = outFile;
 		this.escali = new Escali();
-		this.escali.compileSchema(TextSource.readTextFile(schema));
+		this.escali.compileSchema(TextSource.readTextFile(schema), new DefaultProcessLoger());
 		validate();
 		
 		

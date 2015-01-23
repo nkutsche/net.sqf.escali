@@ -9,12 +9,18 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
+import net.sqf.escali.cmdGui.Fixing;
+import net.sqf.escali.cmdGui.Interactive;
 import net.sqf.escali.cmdGui.Validation;
 import net.sqf.escali.control.Config;
 import net.sqf.escali.control.ConfigFactory;
+import net.sqf.escali.control.EscaliReceiver;
 import net.sqf.escali.control.SVRLReport;
+import net.sqf.escali.control.SchemaInfo;
 import net.sqf.escali.resources.EscaliOptions;
 import net.sqf.stringUtils.TextSource;
+import net.sqf.utils.process.exceptions.CancelException;
+import net.sqf.utils.process.log.DefaultProcessLoger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -57,16 +63,19 @@ public class EscaliCmd {
 			e.printStackTrace();
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
+		} catch (CancelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
-	private void process() throws XPathExpressionException, IOException, TransformerException, SAXException, URISyntaxException, XMLStreamException {
+	private void process() throws XPathExpressionException, IOException, TransformerException, SAXException, URISyntaxException, XMLStreamException, CancelException {
 		if (EscaliOptions.hasOption(cmd, EscaliOptions.VALIDATE_OPTION)) {
 			validateProcess();
 		}
 	}
 	
-	private void validateProcess() throws IOException, XPathExpressionException, TransformerException, SAXException, URISyntaxException, XMLStreamException{
+	private void validateProcess() throws IOException, XPathExpressionException, TransformerException, SAXException, URISyntaxException, XMLStreamException, CancelException{
 		String[] vValues = EscaliOptions.getOptionValues(cmd, EscaliOptions.VALIDATE_OPTION);
 		File schema = new File(vValues[1]);
 		File instance = new File(vValues[0]); 
@@ -74,18 +83,21 @@ public class EscaliCmd {
 		if(EscaliOptions.hasOption(cmd, EscaliOptions.PHASE_OPTION)){
 			config.setPhase(EscaliOptions.getOptionValue(cmd, EscaliOptions.PHASE_OPTION));
 		}
-		Validation cmdValidation = new Validation(schema, config);
-		
+		Validation cmdValidation = new Validation(schema, config, new DefaultProcessLoger());
 		
 		
 		SVRLReport report = cmdValidation.validate(instance);
-		this.result = report.getSVRL();
-		if(EscaliOptions.hasOption(cmd, EscaliOptions.OUTPUT_TYPE_OPTION)){
-			String type = EscaliOptions.getOptionValue(cmd, EscaliOptions.OUTPUT_TYPE_OPTION);
-			this.result = report.getFormatetReport(type);
+		if(EscaliOptions.hasOption(cmd, EscaliOptions.VALIDATE_OPTION)){
+			Interactive menu = new Interactive(report);
+			menu.process();
+		} else {
+			viewReport(report);
 		}
-		
-		finishProcess();
+		try {
+			finishProcess();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void finishProcess() throws IOException{
@@ -98,4 +110,15 @@ public class EscaliCmd {
 			System.out.println(this.result.toString());
 		}
 	}
+
+	public void viewReport(SVRLReport report) {
+		result = report.getSVRL();
+		if(EscaliOptions.hasOption(cmd, EscaliOptions.OUTPUT_TYPE_OPTION)){
+			String type = EscaliOptions.getOptionValue(cmd, EscaliOptions.OUTPUT_TYPE_OPTION);
+			result = report.getFormatetReport(type);
+		}
+		
+		
+	}
+
 }
