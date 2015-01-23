@@ -19,7 +19,7 @@ along with Escali Schematron (xsl/gpl-3.0.txt).  If not, see http://www.gnu.org/
  
 - You have to install Java 1.7 or later.
 - This tool uses the following Java programs:
-	- Calabash v1.0.10-94 (see the Requirements of Calabash on http://xmlcalabash.com/docs/)
+	- Calabash v1.0.11 (customized for the Escali process, see the Requirements of Calabash on http://xmlcalabash.com/docs/)
 	- XSM-Processor v0.1
 
 
