@@ -20,7 +20,7 @@
     
 -->
 
-<p:library xmlns:p="http://www.w3.org/ns/xproc" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.w3.org/ns/xproc-step" version="1.0">
+<p:library xmlns:p="http://www.w3.org/ns/xproc" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.w3.org/ns/xproc-step" version="1.0">
 
     <p:declare-step type="es:validateAndFix" name="es_validateAndFix">
         <p:input port="source" primary="true"/>
@@ -76,14 +76,15 @@
         </es:quickFix>
         <p:choose>
             <p:when test="$xml-save-mode='true'">
-                <p:variable name="sourceFolder" select="replace(resolve-uri('.', document-uri(/)), '^file:', '')">
+                <p:variable name="sourceFolder" select="resolve-uri('.', document-uri(/))">
                     <p:pipe port="source" step="es_validateAndFix"/>
                 </p:variable>
                 <es:xsm name="xsm">
                     <p:with-option name="tempFolder" select="$sourceFolder"/>
                     <p:with-option name="xsmFolder" select="resolve-uri('../../../net.sqf.xsm/xsm/v0.1/')"/>
                 </es:xsm>
-                <p:load href="../../temp/tempOutput.xml"  cx:depends-on="xsm"/>
+<!--                <p:sink name="xsm"/>-->
+                <p:load href="../../temp/tempOutput.xml" cx:depends-on="xsm"/>
             </p:when>
             <p:otherwise>
                 <p:identity/>
@@ -171,25 +172,27 @@
             <p:with-param name="fixId" select="$fixId"/>
         </p:xslt>
     </p:declare-step>
-    
+
     <p:declare-step type="es:compile" name="es_compile">
         <p:input port="schema" primary="true"/>
         <p:output port="validator" primary="true"/>
-        
+
         <p:option name="phase" select="'#ALL'"/>
         <p:option name="lang" select="'#NULL'"/>
-        
+
         <p:validate-with-xml-schema>
             <p:input port="schema">
                 <p:document href="../schema/SQF/schematron-schema.xsd"/>
             </p:input>
         </p:validate-with-xml-schema>
-        
+
         <p:xslt name="excali1">
             <p:input port="stylesheet">
                 <p:document href="../xsl/01_compiler/escali_compiler_1_include.xsl"/>
             </p:input>
-            <p:with-param name="es:lang" select="$lang"/>
+            <p:with-param name="es:lang" select="if ($lang = '#NULL' and /sch:schema/@xml:lang) 
+                                               then (/sch:schema/@xml:lang) 
+                                               else ($lang)"/>
             <p:with-param name="es:type-available" select="'false'"/>
         </p:xslt>
         <p:xslt name="excali2">
@@ -205,7 +208,7 @@
             <p:with-param name="phase" select="$phase"/>
         </p:xslt>
     </p:declare-step>
-    
+
     <p:declare-step type="es:schematron" name="es_schematron">
         <p:input port="schema"/>
         <p:input port="source" primary="true"/>
@@ -213,10 +216,18 @@
             <p:empty/>
         </p:input>
         <p:output port="result" primary="true"/>
+        <p:output port="secundaries" sequence="true">
+            <p:pipe port="source" step="es_schematron"/>
+            <p:pipe port="result" step="xincluded"/>
+            <p:pipe port="validator" step="compiled"/>
+            <p:pipe port="result" step="svrl_raw"/>
+            <p:pipe port="result" step="svrl"/>
+        </p:output>
         <p:option name="phase" select="'#ALL'"/>
         <p:option name="lang" select="'#NULL'"/>
         <p:option name="outputFormat" select="'svrl'"/>
-        
+        <p:option name="xinclude" select="'false'"/>
+
         <es:compile name="compiled">
             <p:with-option name="phase" select="$phase"/>
             <p:with-option name="lang" select="$lang"/>
@@ -224,11 +235,25 @@
                 <p:pipe port="schema" step="es_schematron"/>
             </p:input>
         </es:compile>
-        
-        <p:xslt>
-            <p:input port="source">
-                <p:pipe port="source" step="es_schematron"/>
-            </p:input>
+        <p:choose>
+            <p:when test="$xinclude = 'true'">
+                <p:xinclude>
+                    <p:input port="source">
+                        <p:pipe port="source" step="es_schematron"/>
+                    </p:input>
+                </p:xinclude>
+                <!--                <p:add-xml-base/>-->
+            </p:when>
+            <p:otherwise>
+                <p:identity>
+                    <p:input port="source">
+                        <p:pipe port="source" step="es_schematron"/>
+                    </p:input>
+                </p:identity>
+            </p:otherwise>
+        </p:choose>
+        <p:identity name="xincluded"/>
+        <p:xslt name="svrl_raw">
             <p:input port="stylesheet">
                 <p:pipe port="validator" step="compiled"/>
             </p:input>
@@ -267,6 +292,7 @@
             </p:otherwise>
         </p:choose>
     </p:declare-step>
+
     <p:declare-step type="es:quickFix" name="es_quickFix">
         <p:input port="svrl" primary="true"/>
         <p:input port="source"/>
@@ -306,16 +332,22 @@
         <p:option name="tempFolder"/>
         <p:option name="system" select="'bat'"/>
 
-        <p:variable name="cwd" select="replace($xsmFolder, '^file:', '')"/>
-        <p:variable name="xsmScript" select=" replace(concat($xsmFolder,'xsm.', $system), '^file:', '')"/>
+        <p:variable name="cwd" select="es:get-file-path($xsmFolder)"/>
+        <p:variable name="xsmScript" select=" es:get-file-path(concat($xsmFolder,'xsm.', $system))"/>
         <p:variable name="command" select="   if ($system='bat') 
                                             then ($xsmScript) 
                                             else ($system)"/>
         <p:variable name="manipulator" select="replace(concat($tempFolder, '/manipulator.tmp'), '^file:', '')"/>
-        <p:variable name="outFile" select="replace(resolve-uri('../../temp/tempOutput.xml'), '^file:', '')"/>
+        <p:variable name="manipulatorFile" select="es:get-file-path(concat($tempFolder, '/manipulator.tmp'))"/>
+        
+        <p:variable name="quote" select="if ($system='bat') 
+                                            then ('&quot;') 
+                                            else ('')"/>
+        <p:variable name="outFile" select="es:get-file-path(resolve-uri('../../temp/tempOutput.xml'))"/>
+
         <p:variable name="args" select="concat( if ($system='bat') 
                                               then ('') 
-                                              else ($xsmScript), ' ', $manipulator, ' -o ', $outFile)"/>
+                                              else ($xsmScript), ' ', $quote, $manipulatorFile, $quote, ' -o ', $quote, $outFile, $quote)"/>
         <p:load name="xsm-schema">
             <p:with-option name="href" select="resolve-uri('xml/schema/XSM/xpath-based-string-manipulator.xsd', $xsmFolder)"/>
         </p:load>
@@ -338,6 +370,17 @@
             <p:with-option name="cwd" select="$cwd"/>
             <p:with-option name="args" select="$args"/>
         </p:exec>
-        <p:sink/>
+        <p:add-attribute match="c:result" attribute-name="cwd" xmlns:c="http://www.w3.org/ns/xproc-step">
+            <p:with-option name="attribute-value" select="$cwd"/>
+        </p:add-attribute>
+        <p:add-attribute match="c:result" attribute-name="args" xmlns:c="http://www.w3.org/ns/xproc-step">
+            <p:with-option name="attribute-value" select="$args"/>
+        </p:add-attribute>
+        <p:store href="../../temp/xsm-out.xml"/>
+        <p:store href="../../temp/xsm-err.xml">
+            <p:input port="source">
+                <p:pipe port="errors" step="exec"/>
+            </p:input>
+        </p:store>
     </p:declare-step>
 </p:library>

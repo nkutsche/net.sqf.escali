@@ -52,6 +52,9 @@
         </p:with-option>
     </p:load>
     <p:choose>
+        <p:variable name="xml-save-mode" select="/es:config/es:output/es:xml-save-mode='true' and $system='bat'">
+            <p:pipe port="config" step="main-escali-quickFix"/>
+        </p:variable>
         <p:when test="$userEntries=''">
             <es:quickFix>
                 <p:input port="svrl">
@@ -62,9 +65,7 @@
                 </p:input>
                 <p:with-param name="dummy" select="''"/>
                 <p:with-option name="fixId" select="$fixId"/>
-                <p:with-option name="xml-save-mode" select="/es:config/es:output/es:xml-save-mode">
-                    <p:pipe port="config" step="main-escali-quickFix"/>
-                </p:with-option>
+                <p:with-option name="xml-save-mode" select="$xml-save-mode"/>
             </es:quickFix>
         </p:when>
         <p:otherwise>
@@ -79,14 +80,12 @@
                     <p:pipe port="result" step="userEntrieParams"/>
                 </p:input>
                 <p:with-option name="fixId" select="$fixId"/>
-                <p:with-option name="xml-save-mode" select="/es:config/es:output/es:xml-save-mode">
-                    <p:pipe port="config" step="main-escali-quickFix"/>
-                </p:with-option>
+                <p:with-option name="xml-save-mode" select="$xml-save-mode"/>
             </es:quickFix>
         </p:otherwise>
     </p:choose>
     <p:choose>
-        <p:variable name="xml-save-mode" select="/es:config/es:output/es:xml-save-mode">
+        <p:variable name="xml-save-mode" select="/es:config/es:output/es:xml-save-mode='true' and $system='bat'">
             <p:pipe port="config" step="main-escali-quickFix"/>
         </p:variable>
         <p:variable name="xsmFolder" select="resolve-uri(/es:config/es:output/es:xsm-processor, document-uri(/))">

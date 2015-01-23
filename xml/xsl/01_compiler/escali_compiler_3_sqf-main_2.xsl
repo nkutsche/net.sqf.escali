@@ -44,12 +44,14 @@
     </xd:doc>
 
     <xsl:param name="sqf:changePrefix" select="'sqfc'" as="xs:string"/>
-    <xsl:param name="sqf:useSQF" select="exists(key('sqfelementsBySQF', 'SQF'))" as="xs:boolean"/>
+    <xsl:param name="sqf:useSQF" select="exists(key('elementsByNamespace', 'http://www.schematron-quickfix.com/validator/process'))" as="xs:boolean"/>
 
     <xsl:variable name="es:type-available" select="/sch:schema/@es:type-available = 'true'" as="xs:boolean"/>
 
-    <xsl:key name="sqfelementsBySQF" match="sqf:*" use="'SQF'"/>
+    <xsl:key name="elementsByNamespace" match="*" use="namespace-uri()"/>
     <xsl:namespace-alias stylesheet-prefix="bxsl" result-prefix="axsl"/>
+
+    <xsl:variable name="activityElements" select="('add','delete','replace','stringReplace')"/>
 
     <!--
     fix top level elements in validator
@@ -57,7 +59,6 @@
     <xsl:template name="topLevelValidatorExtension">
         <xsl:if test="$sqf:useSQF">
             <axsl:namespace-alias stylesheet-prefix="axsl" result-prefix="xsl"/>
-            <axsl:variable name="sqf_string">','</axsl:variable>
             <axsl:template match="processing-instruction()[matches(name(),'{$sqf:changePrefix}-(end|start)')]" priority="1000" sqf:changeMarker="true"/>
         </xsl:if>
     </xsl:template>
@@ -65,51 +66,88 @@
     Extension template
     called for used sqf:fix elements
 -->
+    <xsl:variable name="globalFixes" select="/*/sqf:fixes/sqf:fix"/>
+    <xsl:variable name="globalGroups" select="/*/sqf:fixes/sqf:group"/>
+
+    <xsl:function name="es:getActiveFixes" as="element(sqf:fix)*">
+        <xsl:param name="fixIds" as="xs:string*"/>
+        <xsl:param name="availableFixes" as="element(sqf:fix)*"/>
+        <xsl:param name="availableGroups" as="element(sqf:group)*"/>
+        <xsl:for-each select="$fixIds">
+            <xsl:variable name="id" select="."/>
+            <xsl:choose>
+                <xsl:when test="contains($id, '#')">
+                    <xsl:variable name="groupId" select="substring-before($id, '#')"/>
+                    <xsl:variable name="fixId" select="substring-after($id, '#')"/>
+                    <xsl:sequence select="$availableGroups[@id = $groupId]/sqf:fix[@id = $fixId]"/>
+                </xsl:when>
+                <xsl:when test="$availableFixes/@id = $id">
+                    <xsl:sequence select="$availableFixes[@id = $id]"/>
+                </xsl:when>
+                <xsl:when test="$availableGroups/@id = $id">
+                    <xsl:sequence select="$availableGroups[@id = $id]/sqf:fix"/>
+                </xsl:when>
+                <xsl:otherwise/>
+            </xsl:choose>
+        </xsl:for-each>
+    </xsl:function>
+
     <xsl:template name="extension">
         <xsl:param name="messageId" as="xs:string"/>
         <xsl:param name="defaultFix" select="@sqf:default-fix" as="xs:string?"/>
         <xsl:if test="$sqf:useSQF">
-            <xsl:variable name="fix" select="tokenize(current()/@sqf:fix,' ')"/>
-            <xsl:for-each select="../sqf:fix[@id=$fix]
-            |//sqf:fixes/sqf:fix[@id=$fix][not(@id=current()/../sqf:fix/@id)]">
+            <xsl:variable name="fix" select="tokenize(current()/@sqf:fix, '\s+')"/>
+            <xsl:variable name="localFixes" select="../sqf:fix"/>
+            <xsl:variable name="localGroups" select="../sqf:group"/>
+
+            <xsl:variable name="availableFixes" select="$localFixes | $globalFixes[not(@id = ($localFixes/@id, $localGroups/@id))]"/>
+            <xsl:variable name="availableGroups" select="$localGroups | $globalGroups[not(@id = ($localGroups/@id, $localFixes/@id))]"/>
+
+
+
+            <xsl:for-each select="es:getActiveFixes($fix, $availableFixes, $availableGroups)">
                 <xsl:variable name="isDefault" select="$defaultFix = @id"/>
-                <axsl:if test="{if(@use-when) then(@use-when) else('true()')}">
-                    <sqf:fix fixId="{@id}" messageId="{$messageId}">
-                        <xsl:attribute name="contextId">
-                            <xsl:text>{generate-id(self::node())}</xsl:text>
-                        </xsl:attribute>
-                        <xsl:attribute name="id">
-                            <xsl:value-of select="@id"/>
-                            <xsl:text>-</xsl:text>
-                            <xsl:value-of select="$messageId"/>
-                            <xsl:text>-</xsl:text>
-                            <xsl:text>{generate-id(self::node())}</xsl:text>
-                        </xsl:attribute>
-                        <xsl:attribute name="role">
-                            <xsl:variable name="modes" select="('add','delete','replace','stringReplace','template')"/>
-                            <xsl:variable name="modeBoolMap" select="for $mode in $modes return count(sqf:*[local-name()=$mode]) > 0"/>
-                            <xsl:variable name="hasSingleMode" select="count($modeBoolMap[.=true()]) = 1"/>
-                            <xsl:variable name="mode" select=" if ($hasSingleMode) 
-                                                         then ($modes[index-of($modeBoolMap,true())]) 
+                <xsl:variable name="fix" select="."/>
+
+                <axsl:if test="{if (parent::sqf:group/@use-when) then (parent::sqf:group/@use-when) else ('true()')}">
+                    <axsl:if test="{if(@use-when) then(@use-when) else('true()')}">
+                        <xsl:variable name="groupId" select=" if (parent::sqf:group) then (concat(parent::sqf:group/@id, '#')) else ('')"/>
+                        <sqf:fix fixId="{$groupId}{@id}" messageId="{$messageId}">
+                            <xsl:attribute name="contextId">
+                                <xsl:text>{generate-id(self::node())}</xsl:text>
+                            </xsl:attribute>
+                            <xsl:attribute name="id">
+                                <xsl:value-of select="@id"/>
+                                <xsl:text>-</xsl:text>
+                                <xsl:value-of select="$messageId"/>
+                                <xsl:text>-</xsl:text>
+                                <xsl:text>{generate-id(self::node())}</xsl:text>
+                            </xsl:attribute>
+                            <xsl:attribute name="role">
+
+                                <xsl:variable name="singleMode" select="$activityElements[every $el in $fix/sqf:*[local-name()=$activityElements] satisfies local-name($el) = .]" as="xs:string?"/>
+                                <xsl:variable name="mode" select=" if ($singleMode) 
+                                                         then ($singleMode) 
                                                          else ('mix')"/>
-                            <xsl:value-of select="if(@role) then(@role) else($mode)"/>
-                        </xsl:attribute>
-                        <xsl:if test="$isDefault">
-                            <xsl:attribute name="default" select="$isDefault"/>
-                        </xsl:if>
-                        <xsl:call-template name="namespace"/>
-                        <sqf:description>
-                            <xsl:apply-templates select="sqf:description/sqf:p"/>
-                        </sqf:description>
-                        <xsl:apply-templates select="sqf:user-entry" mode="copy">
-                            <xsl:with-param name="messageId" select="$messageId"/>
-                        </xsl:apply-templates>
-                        <sqf:sheet>
-                            <xsl:apply-templates>
+                                <xsl:value-of select="if(@role) then(@role) else($mode)"/>
+                            </xsl:attribute>
+                            <xsl:if test="$isDefault">
+                                <xsl:attribute name="default" select="$isDefault"/>
+                            </xsl:if>
+                            <xsl:call-template name="namespace"/>
+                            <sqf:description>
+                                <xsl:apply-templates select="sqf:description/sqf:p | sqf:description/sqf:title"/>
+                            </sqf:description>
+                            <xsl:apply-templates select="sqf:user-entry" mode="copy">
                                 <xsl:with-param name="messageId" select="$messageId"/>
                             </xsl:apply-templates>
-                        </sqf:sheet>
-                    </sqf:fix>
+                            <sqf:sheet>
+                                <xsl:apply-templates select="sqf:*">
+                                    <xsl:with-param name="messageId" select="$messageId"/>
+                                </xsl:apply-templates>
+                            </sqf:sheet>
+                        </sqf:fix>
+                    </axsl:if>
                 </axsl:if>
             </xsl:for-each>
         </xsl:if>
@@ -156,7 +194,7 @@
                     <xsl:apply-templates select="sch:let|*[namespace-uri()='http://www.w3.org/1999/XSL/Transform']" mode="topLevelResult"/>
                     <bxsl:output method="xml"/>
                     <bxsl:key name="sqf:nodesById" match="node()" use="generate-id()"/>
-                    <bxsl:template match="node()|@*" priority="-2" mode="addAtt addChild"/>
+                    <bxsl:template match="node()|@*" priority="-2" mode="addAtt addChild addLastChild"/>
                     <bxsl:template match="node() | @*" priority="-3" mode="#all">
                         <bxsl:param name="xsm:xml-save-mode" tunnel="yes" select="false()" as="xs:boolean"/>
                         <bxsl:choose>
@@ -196,13 +234,14 @@
     </xsl:template>
 
 
+
+
+
     <!--
 	A C T I V I T Y   E L E M E N T S
 -->
-    <!--
-    Implementation of sqf:DELETE
--->
-    <xsl:template match="sqf:delete">
+
+    <xsl:template match="sqf:delete|sqf:replace|sqf:stringReplace" priority="10">
         <xsl:param name="messageId"/>
         <xsl:variable name="match" select="if (@match) then (@match) else ('self::node()')"/>
         <bxsl:template>
@@ -215,68 +254,24 @@
                 <xsl:value-of select="count(following-sibling::node())+10"/>
             </axsl:attribute>
             <bxsl:param name="xsm:xml-save-mode" select="false()" as="xs:boolean" tunnel="yes"/>
-            <axsl:choose>
-                <axsl:when test="({$match})[1] instance of attribute()">
-                    <bxsl:choose>
-                        <bxsl:when test="$xsm:xml-save-mode">
-                            <xsm:add axis="preceding">
-                                <bxsl:attribute name="node" select="es:getNodePath(..)"/>
-                                <xsm:content>
-                                    <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
-                                        <bxsl:text>delete-</bxsl:text>
-                                        <bxsl:value-of select="generate-id()"/>
-                                    </bxsl:processing-instruction>
-                                </xsm:content>
-                            </xsm:add>
-                            <xsm:delete>
-                                <bxsl:attribute name="node" select="es:getNodePath(.)"/>
-                            </xsm:delete>
-                            <xsm:add axis="child">
-                                <bxsl:attribute name="node" select="es:getNodePath(..)"/>
-                                <xsm:content>
-                                    <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
-                                        <bxsl:text>delete-</bxsl:text>
-                                        <bxsl:value-of select="generate-id()"/>
-                                    </bxsl:processing-instruction>
-                                </xsm:content>
-                            </xsm:add>
-                        </bxsl:when>
-                        <bxsl:otherwise>
-                            <bxsl:attribute name="{$sqf:changePrefix}:attribute-change-no{count(preceding-sibling::sqf:*)}" namespace="http://www.schematron-quickfix.com/validator/process/changes" select="name()" sqf:changeMarker="true"/>
-                        </bxsl:otherwise>
-                    </bxsl:choose>
-                </axsl:when>
-                <axsl:otherwise>
-                    <xsl:call-template name="setVarContext">
-                        <xsl:with-param name="messageId" select="$messageId"/>
-                    </xsl:call-template>
-                </axsl:otherwise>
-            </axsl:choose>
-        </bxsl:template>
-    </xsl:template>
-    <!--
-        Implementation of sqf:REPLACE
-    -->
-    <xsl:template match="sqf:replace">
-        <xsl:param name="messageId"/>
-        <bxsl:template>
-            <axsl:attribute name="match">
-                <xsl:call-template name="nodeMatching">
-                    <xsl:with-param name="nodes" select=" if (@match) then (@match) else ('self::node()')"/>
-                </xsl:call-template>
-            </axsl:attribute>
-            <axsl:attribute name="priority">
-                <xsl:value-of select="count(following-sibling::node())+10"/>
-            </axsl:attribute>
-            <bxsl:param name="xsm:xml-save-mode" select="false()" as="xs:boolean" tunnel="yes"/>
+
             <xsl:call-template name="setVarContext">
                 <xsl:with-param name="messageId" select="$messageId"/>
+                <xsl:with-param name="templateBody">
+                    <bxsl:choose>
+                        <bxsl:when test="$xsm:xml-save-mode">
+                            <xsl:apply-templates select="." mode="xsm:save-mode"/>
+                        </bxsl:when>
+                        <bxsl:otherwise>
+                            <xsl:apply-templates select="." mode="xsm:no-xsm"/>
+                        </bxsl:otherwise>
+                    </bxsl:choose>
+                </xsl:with-param>
             </xsl:call-template>
+
         </bxsl:template>
     </xsl:template>
-    <!--
-        Implementation of sqf:ADD
-    -->
+
     <xsl:template match="sqf:add">
         <xsl:param name="messageId"/>
         <bxsl:template>
@@ -289,13 +284,10 @@
                 <xsl:value-of select="count(following-sibling::node())+10"/>
             </axsl:attribute>
             <xsl:choose>
-                <xsl:when test="@axis=('@','attribute')">
+                <xsl:when test="@node-type='attribute'">
                     <axsl:attribute name="mode">addAtt</axsl:attribute>
                 </xsl:when>
-                <xsl:when test="not(@axis) and @node-type='attribute'">
-                    <axsl:attribute name="mode">addAtt</axsl:attribute>
-                </xsl:when>
-                <xsl:when test="not(@axis) and (@node-type='keep' or not(@node-type))">
+                <xsl:when test="@node-type='keep' or not(@node-type)">
                     <xsl:variable name="match" select=" if (@match) then (@match) else ('self::node()')"/>
                     <axsl:choose>
                         <axsl:when test="({$match})[1] instance of attribute()">
@@ -306,27 +298,50 @@
                         </axsl:otherwise>
                     </axsl:choose>
                 </xsl:when>
-                <xsl:when test="@axis=('child') or not(@axis)">
+                <xsl:when test="@position=('first-child') or not(@position)">
                     <axsl:attribute name="mode">addChild</axsl:attribute>
+                </xsl:when>
+                <xsl:when test="@position = ('last-child')">
+                    <axsl:attribute name="mode">addLastChild</axsl:attribute>
                 </xsl:when>
             </xsl:choose>
             <bxsl:param name="xsm:xml-save-mode" select="false()" as="xs:boolean" tunnel="yes"/>
             <xsl:choose>
-                <xsl:when test="@axis=('following','following-sibling')">
+                <xsl:when test="@position=('after')">
                     <bxsl:next-match/>
                     <xsl:call-template name="setVarContext">
                         <xsl:with-param name="messageId" select="$messageId"/>
+                        <xsl:with-param name="templateBody">
+                            <bxsl:choose>
+                                <bxsl:when test="$xsm:xml-save-mode">
+                                    <xsl:apply-templates select="." mode="xsm:save-mode"/>
+                                </bxsl:when>
+                                <bxsl:otherwise>
+                                    <xsl:apply-templates select="." mode="xsm:no-xsm"/>
+                                </bxsl:otherwise>
+                            </bxsl:choose>
+                        </xsl:with-param>
                     </xsl:call-template>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:call-template name="setVarContext">
                         <xsl:with-param name="messageId" select="$messageId"/>
+                        <xsl:with-param name="templateBody">
+                            <bxsl:choose>
+                                <bxsl:when test="$xsm:xml-save-mode">
+                                    <xsl:apply-templates select="." mode="xsm:save-mode"/>
+                                </bxsl:when>
+                                <bxsl:otherwise>
+                                    <xsl:apply-templates select="." mode="xsm:no-xsm"/>
+                                </bxsl:otherwise>
+                            </bxsl:choose>
+                        </xsl:with-param>
                     </xsl:call-template>
                     <bxsl:next-match/>
                 </xsl:otherwise>
             </xsl:choose>
         </bxsl:template>
-        <xsl:if test="@axis=('child','@','attribute') or not(@axis)">
+        <xsl:if test="@position=('first-child','last-child') or not(@position)">
             <bxsl:template>
                 <axsl:variable name="match">
                     <xsl:call-template name="nodeMatching">
@@ -348,7 +363,7 @@
                 <bxsl:choose>
                     <bxsl:when test="$xsm:xml-save-mode">
                         <bxsl:if test="$attributes/sqf:transmitter/xsm:*">
-                            <xsm:add axis="preceding">
+                            <xsm:add position="before">
                                 <bxsl:attribute name="node" select="es:getNodePath(.)"/>
                                 <xsm:content>
                                     <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
@@ -358,7 +373,7 @@
                                 </xsm:content>
                             </xsm:add>
                             <bxsl:copy-of select="$attributes/sqf:transmitter/xsm:*"/>
-                            <xsm:add axis="child">
+                            <xsm:add position="first-child">
                                 <bxsl:attribute name="node" select="es:getNodePath(.)"/>
                                 <xsm:content>
                                     <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
@@ -369,6 +384,8 @@
                             </xsm:add>
                         </bxsl:if>
                         <bxsl:apply-templates select="self::*" mode="addChild"/>
+                        <bxsl:apply-templates select="self::*" mode="addLastChild"/>
+                        <bxsl:apply-templates select="node()"/>
                     </bxsl:when>
                     <bxsl:otherwise>
                         <bxsl:variable name="newAttributes" select="$attributes/sqf:transmitter/@*"/>
@@ -390,36 +407,198 @@
                             </bxsl:if>
                             <bxsl:apply-templates select="self::*" mode="addChild"/>
                             <bxsl:apply-templates select="node()"/>
+                            <bxsl:apply-templates select="self::*" mode="addLastChild"/>
                         </bxsl:copy>
                     </bxsl:otherwise>
                 </bxsl:choose>
 
             </bxsl:template>
-            <!--<xsl:if test="not(preceding-sibling::sqf:add)">
-                <bxsl:template match="node()|@*" priority="{1 - count(../*)}" mode="addAtt addChild"/>
-            </xsl:if>-->
         </xsl:if>
     </xsl:template>
+
+    <!--
+    Implementation of sqf:DELETE
+-->
+    <xsl:template match="sqf:delete" mode="xsm:save-mode">
+        <bxsl:variable name="node" select="es:getNodePath(.)"/>
+        <bxsl:choose>
+            <bxsl:when test=". instance of attribute()">
+                <bxsl:variable name="parent" select="es:getNodePath(..)"/>
+                <xsm:add position="before">
+                    <bxsl:attribute name="node" select="$parent"/>
+                    <xsm:content>
+                        <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
+                            <bxsl:text>delete-</bxsl:text>
+                            <bxsl:value-of select="generate-id()"/>
+                        </bxsl:processing-instruction>
+                    </xsm:content>
+                </xsm:add>
+                <xsm:add position="first-child">
+                    <bxsl:attribute name="node" select="$parent"/>
+                    <xsm:content>
+                        <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
+                            <bxsl:text>delete-</bxsl:text>
+                            <bxsl:value-of select="generate-id()"/>
+                        </bxsl:processing-instruction>
+                    </xsm:content>
+                </xsm:add>
+                <xsm:delete>
+                    <bxsl:attribute name="node" select="$node"/>
+                </xsm:delete>
+            </bxsl:when>
+            <bxsl:otherwise>
+                <xsm:replace>
+                    <bxsl:attribute name="node" select="$node"/>
+                    <xsm:content>
+                        <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
+                            <bxsl:text>delete-</bxsl:text>
+                            <bxsl:value-of select="generate-id()"/>
+                        </bxsl:processing-instruction>
+                        <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
+                            <bxsl:text>delete-</bxsl:text>
+                            <bxsl:value-of select="generate-id()"/>
+                        </bxsl:processing-instruction>
+                    </xsm:content>
+                </xsm:replace>
+            </bxsl:otherwise>
+        </bxsl:choose>
+    </xsl:template>
+
+    <xsl:template match="sqf:delete" mode="xsm:no-xsm">
+        <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
+            <bxsl:text>delete-</bxsl:text>
+            <bxsl:value-of select="generate-id()"/>
+        </bxsl:processing-instruction>
+        <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
+            <bxsl:text>delete-</bxsl:text>
+            <bxsl:value-of select="generate-id()"/>
+        </bxsl:processing-instruction>
+    </xsl:template>
+
+    <!--
+        Implementation of sqf:REPLACE
+    -->
+    <xsl:template match="sqf:replace" mode="xsm:save-mode">
+        <axsl:variable name="match">
+            <xsl:call-template name="nodeMatching">
+                <xsl:with-param name="nodes" select=" if (@match) then (@match) else ('self::node()')"/>
+            </xsl:call-template>
+        </axsl:variable>
+        <axsl:variable name="nodeFac">
+            <xsl:call-template name="nodeFac"/>
+        </axsl:variable>
+        <axsl:if test="$nodeFac/xsl:attribute">
+            <bxsl:variable name="parent" select="es:getNodePath(..)"/>
+            <xsm:add position="before">
+                <bxsl:attribute name="node" select="$parent"/>
+                <xsm:content>
+                    <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
+                        <bxsl:text>attribute-change-</bxsl:text>
+                        <bxsl:value-of select="generate-id()"/>
+                    </bxsl:processing-instruction>
+                </xsm:content>
+            </xsm:add>
+            <xsm:add position="first-child">
+                <bxsl:attribute name="node" select="$parent"/>
+                <xsm:content>
+                    <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
+                        <bxsl:text>attribute-change-</bxsl:text>
+                        <bxsl:value-of select="generate-id()"/>
+                    </bxsl:processing-instruction>
+                </xsm:content>
+            </xsm:add>
+        </axsl:if>
+        <xsm:replace>
+            <bxsl:attribute name="node" select="es:getNodePath(.)"/>
+            <xsm:content>
+                <axsl:copy-of select="$nodeFac"/>
+            </xsm:content>
+        </xsm:replace>
+    </xsl:template>
+
+    <xsl:template match="sqf:replace" mode="xsm:no-xsm">
+        <xsl:call-template name="nodeFac"/>
+    </xsl:template>
+
     <!--
         Implementation of sqf:STRINGREPLACE
     -->
-    <xsl:template match="sqf:stringReplace">
-        <xsl:param name="messageId"/>
-        <bxsl:template>
-            <axsl:attribute name="match">
+    <xsl:template match="sqf:stringReplace" mode="xsm:save-mode">
+        <xsm:replace>
+            <bxsl:attribute name="node" select="es:getNodePath(.)"/>
+            <xsm:content>
+                <bxsl:analyze-string select="." regex="{@regex}">
+                    <bxsl:matching-substring>
+                        <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
+                            <bxsl:text>stringReplace-</bxsl:text>
+                            <bxsl:value-of select="$activityContext/generate-id()"/>
+                        </bxsl:processing-instruction>
+                        <xsl:apply-templates mode="template"/>
+                        <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
+                            <bxsl:text>stringReplace-</bxsl:text>
+                            <bxsl:value-of select="$activityContext/generate-id()"/>
+                        </bxsl:processing-instruction>
+                    </bxsl:matching-substring>
+                    <bxsl:non-matching-substring>
+                        <bxsl:value-of select="."/>
+                    </bxsl:non-matching-substring>
+                </bxsl:analyze-string>
+            </xsm:content>
+        </xsm:replace>
+    </xsl:template>
+
+    <xsl:template match="sqf:stringReplace" mode="xsm:no-xsm">
+        <bxsl:analyze-string select="." regex="{@regex}">
+            <bxsl:matching-substring>
+                <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
+                    <bxsl:text>stringReplace-</bxsl:text>
+                    <bxsl:value-of select="$activityContext/generate-id()"/>
+                </bxsl:processing-instruction>
+                <xsl:apply-templates mode="template"/>
+                <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
+                    <bxsl:text>stringReplace-</bxsl:text>
+                    <bxsl:value-of select="$activityContext/generate-id()"/>
+                </bxsl:processing-instruction>
+            </bxsl:matching-substring>
+            <bxsl:non-matching-substring>
+                <bxsl:value-of select="."/>
+            </bxsl:non-matching-substring>
+        </bxsl:analyze-string>
+    </xsl:template>
+
+    <!--
+        Implementation of sqf:ADD
+    -->
+    <xsl:template match="sqf:add" mode="xsm:save-mode">
+        <xsm:add>
+            <axsl:variable name="match">
                 <xsl:call-template name="nodeMatching">
                     <xsl:with-param name="nodes" select=" if (@match) then (@match) else ('self::node()')"/>
                 </xsl:call-template>
-            </axsl:attribute>
-            <axsl:attribute name="priority">
-                <xsl:value-of select="count(following-sibling::node())+10"/>
-            </axsl:attribute>
-            <bxsl:param name="xsm:xml-save-mode" select="false()" as="xs:boolean" tunnel="yes"/>
-            <xsl:call-template name="setVarContext">
-                <xsl:with-param name="messageId" select="$messageId"/>
-            </xsl:call-template>
-        </bxsl:template>
+            </axsl:variable>
+            <axsl:variable name="position" select="'{@position}'"/>
+            <axsl:variable name="node-type" select="'{@node-type}'"/>
+            <axsl:attribute name="position" select="if ($position='') 
+                then (
+                if ($node-type='attribute') 
+                then ('attribute') 
+                else if ($node-type=('keep','') and (($match)[1] instance of attribute())) 
+                then ('attribute') 
+                else ('first-child')) 
+                else ($position)"> </axsl:attribute>
+            <bxsl:attribute name="node" select="es:getNodePath(.)"/>
+            <xsm:content>
+                <xsl:call-template name="nodeFac"/>
+            </xsm:content>
+        </xsm:add>
     </xsl:template>
+
+    <xsl:template match="sqf:add" mode="xsm:no-xsm">
+        <xsl:call-template name="nodeFac"/>
+    </xsl:template>
+
+
+
 
     <!--   
     Content of activity elements
@@ -541,6 +720,11 @@
             <xsl:apply-templates/>
         </svrl:text>
     </xsl:template>
+    <xsl:template match="sqf:description/sqf:title" mode="#all" priority="100">
+        <sqf:title>
+            <xsl:apply-templates/>
+        </sqf:title>
+    </xsl:template>
     <xsl:template match="sqf:description"/>
 
 
@@ -570,33 +754,26 @@
         - for variables inside of the activity elements
 -->
     <xsl:template name="setVarContext">
-        <xsl:param name="messageId"/>
+        <xsl:param name="messageId" as="xs:string"/>
+        <xsl:param name="templateBody" as="node()*"/>
+        <xsl:variable name="activityElement" select="."/>
+        <xsl:variable name="fix" select="parent::sqf:fix"/>
+        <xsl:variable name="fixOrGroup" select=" if ($fix/parent::sqf:group) 
+                                        then ($fix/parent::sqf:group) 
+                                        else ($fix)"/>
+        <xsl:variable name="rule" select="$fixOrGroup/parent::sch:rule" as="element(sch:rule)"/>
 
-        <!--<bxsl:variable name="ruleContext">
-            <axsl:attribute name="select">
-                <!-\-<xsl:text>//</xsl:text>
-                <xsl:call-template name="nodeMatching">
-                    <xsl:with-param name="nodes" select="'self::node()'"/>
-                </xsl:call-template>-\->
-                <xsl:text>key('sqf:nodesById',('</xsl:text>
-                <axsl:value-of select="generate-id()"/>
-                <xsl:text>'))</xsl:text>
-            </axsl:attribute>
-        </bxsl:variable>-->
         <bxsl:variable name="ruleContext">
             <axsl:attribute name="select">
                 <xsl:call-template name="nodeMatching">
                     <xsl:with-param name="nodes" select="'self::node()'"/>
                 </xsl:call-template>
-                <!--<xsl:text>key('sqf:nodesById',('</xsl:text>
-                <axsl:value-of select="generate-id()"/>
-                <xsl:text>'))</xsl:text>-->
             </axsl:attribute>
         </bxsl:variable>
         <bxsl:variable name="activityContext">
             <axsl:attribute name="select">self::node()</axsl:attribute>
         </bxsl:variable>
-        <xsl:for-each select="ancestor::sqf:fix/sqf:param[@user-entry='yes']">
+        <xsl:for-each select="$fix/sqf:param[@user-entry='yes']">
             <bxsl:variable name="{@name}">
                 <xsl:attribute name="select">
                     <xsl:text>$sqf:</xsl:text>
@@ -608,7 +785,35 @@
             </bxsl:variable>
         </xsl:for-each>
         <bxsl:for-each select="$ruleContext">
-            <xsl:for-each select="ancestor::sqf:fix/sqf:param[not(@user-entry='yes')]          |ancestor::sch:rule/sch:let          |ancestor::sqf:*/sch:let          |ancestor::sch:rule/xsl:variable          |ancestor::sqf:*/xsl:variable">
+            <xsl:variable name="ruleLevelVars" select="$fixOrGroup/preceding-sibling::* intersect ($rule/sch:let, $rule/xsl:variable)"/>
+            <xsl:variable name="fixLevelVars" select="$activityElement/preceding-sibling::* intersect ($fix/sqf:param, $fix/sch:let, $fix/xsl:variable)"/>
+            <xsl:for-each select="$ruleLevelVars, $fixLevelVars">
+                <xsl:choose>
+                    <xsl:when test="self::sqf:param[@user-entry='yes'] ">
+                        <bxsl:variable name="{@name}">
+                            <xsl:attribute name="select">
+                                <xsl:text>$sqf:</xsl:text>
+                                <xsl:value-of select="generate-id()"/>
+                                <xsl:text>_</xsl:text>
+                                <xsl:value-of select="$messageId"/>
+                                <xsl:text>_{generate-id()}</xsl:text>
+                            </xsl:attribute>
+                        </bxsl:variable>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <bxsl:variable name="{@name}">
+                            <xsl:if test="@value|@select">
+                                <axsl:attribute name="select">
+                                    <xsl:value-of select="replace(@value|@select,'current\(\)','\$ruleContext')"/>
+                                </axsl:attribute>
+                            </xsl:if>
+                            <xsl:copy-of select="node()"/>
+                        </bxsl:variable>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+
+            <!--<xsl:for-each select="ancestor::sqf:fix/sqf:param[not(@user-entry='yes')]          |ancestor::sch:rule/sch:let          |ancestor::sqf:*/sch:let          |ancestor::sch:rule/xsl:variable          |ancestor::sqf:*/xsl:variable">
                 <bxsl:variable name="{@name}">
                     <xsl:if test="@value|@select">
                         <axsl:attribute name="select">
@@ -617,127 +822,12 @@
                     </xsl:if>
                     <xsl:copy-of select="node()"/>
                 </bxsl:variable>
-            </xsl:for-each>
+            </xsl:for-each>-->
             <bxsl:for-each select="$activityContext">
                 <xsl:for-each select="sch:let">
                     <bxsl:variable name="{@name}" select="{@value}"/>
                 </xsl:for-each>
-                <bxsl:choose>
-                    <bxsl:when test="$xsm:xml-save-mode">
-                        <xsl:choose>
-                            <xsl:when test="self::sqf:delete">
-                                <xsm:replace>
-                                    <bxsl:attribute name="node" select="es:getNodePath(.)"/>
-                                    <xsm:content>
-                                        <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
-                                            <bxsl:text>delete-</bxsl:text>
-                                            <bxsl:value-of select="generate-id()"/>
-                                        </bxsl:processing-instruction>
-                                        <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
-                                            <bxsl:text>delete-</bxsl:text>
-                                            <bxsl:value-of select="generate-id()"/>
-                                        </bxsl:processing-instruction>
-                                    </xsm:content>
-                                </xsm:replace>
-                            </xsl:when>
-                            <xsl:when test="self::sqf:stringReplace">
-                                <xsm:replace>
-                                    <bxsl:attribute name="node" select="es:getNodePath(.)"/>
-                                    <xsm:content>
-                                        <bxsl:analyze-string select="." regex="{@regex}">
-                                            <bxsl:matching-substring>
-                                                <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
-                                                    <bxsl:text>stringReplace-</bxsl:text>
-                                                    <bxsl:value-of select="$activityContext/generate-id()"/>
-                                                </bxsl:processing-instruction>
-                                                <xsl:apply-templates mode="template"/>
-                                                <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
-                                                    <bxsl:text>stringReplace-</bxsl:text>
-                                                    <bxsl:value-of select="$activityContext/generate-id()"/>
-                                                </bxsl:processing-instruction>
-                                            </bxsl:matching-substring>
-                                            <bxsl:non-matching-substring>
-                                                <bxsl:value-of select="."/>
-                                            </bxsl:non-matching-substring>
-                                        </bxsl:analyze-string>
-                                    </xsm:content>
-                                </xsm:replace>
-                            </xsl:when>
-                            <xsl:when test="self::sqf:add">
-                                <xsm:add>
-                                    <axsl:variable name="match">
-                                        <xsl:call-template name="nodeMatching">
-                                            <xsl:with-param name="nodes" select=" if (@match) then (@match) else ('self::node()')"/>
-                                        </xsl:call-template>
-                                    </axsl:variable>
-                                    <axsl:variable name="axis" select="'{@axis}'"/>
-                                    <axsl:variable name="node-type" select="'{@node-type}'"/>
-                                    <axsl:attribute name="axis" select="if ($axis='') 
-                                                                        then (
-                                                                                if ($node-type='attribute') 
-                                                                              then ('attribute') 
-                                                                              else if ($node-type=('keep','') and (($match)[1] instance of attribute())) 
-                                                                              then ('attribute') 
-                                                                              else ('child')) 
-                                                                        else ($axis)"> </axsl:attribute>
-                                    <bxsl:attribute name="node" select="es:getNodePath(.)"/>
-                                    <xsm:content>
-                                        <xsl:call-template name="nodeFac"/>
-                                    </xsm:content>
-                                </xsm:add>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsm:replace>
-                                    <axsl:variable name="match">
-                                        <xsl:call-template name="nodeMatching">
-                                            <xsl:with-param name="nodes" select=" if (@match) then (@match) else ('self::node()')"/>
-                                        </xsl:call-template>
-                                    </axsl:variable>
-                                    <bxsl:attribute name="node" select="es:getNodePath(.)"/>
-                                    <xsm:content>
-                                        <xsl:call-template name="nodeFac"/>
-                                    </xsm:content>
-                                </xsm:replace>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </bxsl:when>
-                    <bxsl:otherwise>
-                        <xsl:choose>
-                            <xsl:when test="self::sqf:delete">
-                                <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
-                                    <bxsl:text>delete-</bxsl:text>
-                                    <bxsl:value-of select="generate-id()"/>
-                                </bxsl:processing-instruction>
-                                <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
-                                    <bxsl:text>delete-</bxsl:text>
-                                    <bxsl:value-of select="generate-id()"/>
-                                </bxsl:processing-instruction>
-                            </xsl:when>
-                            <xsl:when test="self::sqf:stringReplace">
-                                <bxsl:analyze-string select="." regex="{@regex}">
-                                    <bxsl:matching-substring>
-                                        <bxsl:processing-instruction name="{$sqf:changePrefix}-start" sqf:changeMarker="true">
-                                            <bxsl:text>stringReplace-</bxsl:text>
-                                            <bxsl:value-of select="$activityContext/generate-id()"/>
-                                        </bxsl:processing-instruction>
-                                        <xsl:apply-templates mode="template"/>
-                                        <bxsl:processing-instruction name="{$sqf:changePrefix}-end" sqf:changeMarker="true">
-                                            <bxsl:text>stringReplace-</bxsl:text>
-                                            <bxsl:value-of select="$activityContext/generate-id()"/>
-                                        </bxsl:processing-instruction>
-                                    </bxsl:matching-substring>
-                                    <bxsl:non-matching-substring>
-                                        <bxsl:value-of select="."/>
-                                    </bxsl:non-matching-substring>
-                                </bxsl:analyze-string>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:call-template name="nodeFac"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </bxsl:otherwise>
-                </bxsl:choose>
-
+                <xsl:copy-of select="$templateBody"/>
             </bxsl:for-each>
         </bxsl:for-each>
     </xsl:template>
@@ -850,16 +940,16 @@
             </axsl:attribute>
             <xsl:choose>
                 <xsl:when test="@select">
-                    <axsl:choose>
-                        <axsl:when test="({@select})[1] instance of node()">
+                    <bxsl:choose>
+                        <bxsl:when test="({@select})[1] instance of node()">
                             <bxsl:apply-templates select="{@select}">
                                 <bxsl:with-param name="xsm:xml-save-mode" select="false()" as="xs:boolean" tunnel="yes"/>
                             </bxsl:apply-templates>
-                        </axsl:when>
-                        <axsl:otherwise>
+                        </bxsl:when>
+                        <bxsl:otherwise>
                             <bxsl:value-of select="{@select}"/>
-                        </axsl:otherwise>
-                    </axsl:choose>
+                        </bxsl:otherwise>
+                    </bxsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:apply-templates mode="template"/>
