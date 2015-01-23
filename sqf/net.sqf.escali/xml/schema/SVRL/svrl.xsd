@@ -9,6 +9,7 @@
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://purl.oclc.org/dsdl/svrl" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" xmlns:es="http://www.escali.schematron-quickfix.com/" xml:lang="en">
     
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
     <xs:import namespace="http://www.schematron-quickfix.com/validator/process" schemaLocation="sqf-svrl.xsd"/>
     <xs:import namespace="http://www.escali.schematron-quickfix.com/" schemaLocation="escali-svrl.xsd"/>
     
@@ -80,6 +81,7 @@
             <xs:attribute name="role" type="xs:NMTOKEN"/>
             <xs:attribute name="flag" type="xs:NMTOKEN"/>
             <xs:attribute ref="es:id" use="required"/>
+            <xs:attribute ref="xml:base" use="optional"/>
         </xs:complexType>
     </xs:element>
     <!-- only references are reported, not the diagnostic -->
@@ -127,6 +129,7 @@
         <xs:attribute name="test" use="required"/>
         <xs:attribute name="role" type="xs:NMTOKEN"/>
         <xs:attribute name="flag" type="xs:NMTOKEN"/>
+        <xs:attribute ref="xml:base" use="optional"/>
         <xs:attribute ref="es:id" use="required"/>
         <xs:attribute ref="sqf:default-fix"/>
         <xs:attributeGroup ref="es:icon.link"/>

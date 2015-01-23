@@ -54,6 +54,8 @@
     <xsl:key name="sqfLangnodesByLang" match="sqf:p" use="(es:getLang(.), '#ALL')"/>
     <xsl:key name="sqfSelectedNodesById" match="key('sqfLangnodesByLang', $es:lang)" use="generate-id()"/>
     
+    <xsl:key name="sqfGlobalFixById" match="sqf:fixes/sqf:fix" use="@id"/>
+    
     
     <xsl:template match="sqf:p" priority="100">
         <xsl:choose>
@@ -65,6 +67,8 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+    
+    
     
     <!--
 	sqf:call-fix
@@ -79,7 +83,7 @@
         <xsl:param name="params" select="()" tunnel="yes"/>
         <xsl:variable name="overlayedParam" select="$params[@name=current()/@name]"/>
         <xsl:copy>
-            <xsl:apply-templates select="@name | @user-entry"/>
+            <xsl:apply-templates select="@name | @user-entry | @required"/>
             <xsl:if test="$es:type-available != 'false'">
                 <xsl:apply-templates select="@as"/>
             </xsl:if>

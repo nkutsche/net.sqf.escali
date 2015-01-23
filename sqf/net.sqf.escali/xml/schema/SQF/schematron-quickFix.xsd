@@ -23,7 +23,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="http://www.schematron-quickfix.com/validator/process" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xml:lang="en">
     <xs:import namespace="http://purl.oclc.org/dsdl/schematron" schemaLocation="schematron-schema.xsd"/>
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
-    
+
     <xs:annotation>
         <xs:appinfo source="sqf:meta">
             <title navTitle="SQF reference">Schematron QuickFix reference</title>
@@ -32,7 +32,7 @@
             <title navTitle="SQF-Referenz">Schematron QuickFix Referenz</title>
         </xs:appinfo>
     </xs:annotation>
-    
+
     <xs:annotation>
         <xs:documentation>In this documentation the following expressions will be used. The table bellow shows the definitions of these expressions:</xs:documentation>
         <xs:documentation source="QuickFix">A possible fix for a Schematron report or assert. An implementation should provide it to the user (per default) for each reported assert or report. The QuickFix will be executed if the user chooses it.</xs:documentation>
@@ -67,6 +67,13 @@
             </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
+    <xs:attributeGroup name="rootAttributes">
+        <xs:attribute name="version" type="xs:token">
+            <xs:annotation>
+                <xs:documentation>The attribute defines the used Schematron QuickFix version. The attribute should be set, if the Schematron schema uses the Schematron QuickFix extensions.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:attributeGroup>
 
 
     <xs:group name="templateElements">
@@ -92,14 +99,48 @@
             </xs:choice>
         </xs:sequence>
     </xs:group>
+    <xs:group name="fixElements">
+        <xs:annotation>
+            <xs:documentation>Elements to define QuickFixes or QuickFix groups inside of a Schematron schema.</xs:documentation>
+        </xs:annotation>
+        <xs:choice>
+            <xs:element ref="sqf:fix"/>
+            <xs:element ref="sqf:group"/>
+        </xs:choice>
+    </xs:group>
+
     <xs:element name="fixes">
         <xs:annotation>
-            <xs:documentation>Contains globally useable Schematron QuickFixes.</xs:documentation>
+            <xs:documentation>Contains globally useable Schematron QuickFixes and QuickFix groups.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="sqf:fix" maxOccurs="unbounded"/>
-            </xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="sqf:fixElements"/>
+            </xs:choice>
+            <xs:attribute ref="xml:lang"/>
+            <xs:attribute name="id" type="xs:ID"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="group">
+        <xs:annotation>
+            <xs:documentation>Defines a Schematron QuickFix group. If the group is linked by an assert or report, all QuickFixes of this group will be accosieted with the assert/report.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="sqf:fix"/>
+            </xs:choice>
+            <xs:attribute name="id" use="required" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>The ID to reference the QuickFix group.</xs:documentation>
+                    <xs:documentation source="value">characters of type xs:ID. The value must be unique in the parent element.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="use-when" use="optional" type="xs:string" default="true()">
+                <xs:annotation>
+                    <xs:documentation>The condition to provide the QuickFixes of the QuickFix group.</xs:documentation>
+                    <xs:documentation source="value">XPath expression. Its expect as return value an xs:boolean.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:attribute ref="xml:lang"/>
         </xs:complexType>
     </xs:element>
@@ -109,6 +150,10 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="sch:foreign"/>
+                    <xs:element ref="sch:let"/>
+                </xs:choice>
                 <xs:element ref="sqf:description"/>
                 <xs:group ref="sch:foreign"/>
                 <xs:choice>
@@ -161,8 +206,9 @@
             <xs:documentation>Adds a human readable description to the parent element.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence maxOccurs="unbounded">
-                <xs:element ref="sqf:p"/>
+            <xs:sequence>
+                <xs:element ref="sqf:title"/>
+                <xs:element ref="sqf:p" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute ref="xml:lang"/>
         </xs:complexType>
@@ -226,6 +272,9 @@
             <xs:documentation>The content defines a default value for the parameter.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:any processContents="skip"/>
+            </xs:choice>
             <xs:attribute name="name" type="xs:string" use="required">
                 <xs:annotation>
                     <xs:documentation>This attribute defines the name of the parameter.</xs:documentation>
@@ -257,6 +306,21 @@
                     </xs:restriction>
                 </xs:simpleType>
             </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="title">
+        <xs:annotation>
+            <xs:documentation>Name of a QuickFix or a user entry.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="sch:foreign"/>
+                <xs:choice>
+                    <xs:element ref="sch:name"/>
+                    <xs:element ref="sch:value-of"/>
+                </xs:choice>
+            </xs:choice>
+            <xs:attribute ref="xml:lang"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="p">
@@ -304,17 +368,17 @@
     <xs:element name="add">
         <xs:annotation>
             <xs:documentation>This activity element adds a node to one or more nodes of the XML instance.</xs:documentation>
-            <xs:documentation>The attributes <icode type="attribute">match</icode> and <icode type="attribute">axis</icode> define the position where the nodes will be added. The position is determined by the anchor node(s) (<a ref="#activityBase_match">@match</a>) and the insertion direction (<a ref="#add_axis">@axis</a>).</xs:documentation>
+            <xs:documentation>The attributes <icode type="attribute">match</icode> and <icode type="attribute">position</icode> define the position where the nodes will be added. The position is determined by the anchor node(s) (<a ref="#activityBase_match">@match</a>) and the insertion direction (<a ref="#add_position">@position</a>).</xs:documentation>
             <xs:documentation>The attributes <icode type="attribute">node-type</icode>, <icode type="attribute">select</icode> and <icode type="attribute">target</icode> and the content of the element define the nodes to be added.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
             <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:group ref="sqf:templateElements"/>
             </xs:choice>
-            <xs:attribute name="axis" type="sqf:axisType">
+            <xs:attribute name="position" type="sqf:positionType">
                 <xs:annotation>
-                    <xs:documentation>The <icode type="attribute">axis</icode> attribute defines the position of the nodes to be added relatively to the anchor node (see <a ref="#activityBase_match">@match</a>).</xs:documentation>
-                    <xs:documentation source="Default">If the value of the <icode type="attribute">node-type</icode> attribute is <icode type="attributeValue">attribute</icode>, the default value is <icode type="attributeValue">attribute</icode>. Otherwise the default value is <icode type="attributeValue">child</icode>.</xs:documentation>
+                    <xs:documentation>The <icode type="attribute">position</icode> attribute defines the position of the nodes to be added relatively to the anchor node (see <a ref="#activityBase_match">@match</a>).</xs:documentation>
+                    <xs:documentation source="Default">If the value of the <icode type="attribute">node-type</icode> attribute is <icode type="attributeValue">attribute</icode>, the <icode type="attribute">position</icode> attribute should not be set, because the node to be added will always be inserted as attribute. Otherwise the default value is <icode type="attributeValue">first-child</icode>.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attributeGroup ref="sqf:activityManipulate"/>
@@ -372,41 +436,26 @@
             </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
-    <xs:simpleType name="axisType">
+    <xs:simpleType name="positionType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="following">
+            <xs:enumeration value="after">
                 <xs:annotation>
-                    <xs:documentation>The short notation of <icode type="attributeValue">following-sibling</icode>.</xs:documentation>
+                    <xs:documentation>The nodes to be added will be inserted after the anchor node.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-            <xs:enumeration value="following-sibling">
+            <xs:enumeration value="before">
                 <xs:annotation>
-                    <xs:documentation>The nodes to be added will be inserted into the first position of the following-sibling axis of the anchor node.</xs:documentation>
+                    <xs:documentation>The nodes to be added will be inserted before the anchor node.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-            <xs:enumeration value="preceding">
+            <xs:enumeration value="first-child">
                 <xs:annotation>
-                    <xs:documentation>The short notation of <icode type="attributeValue">preceding-sibling</icode>.</xs:documentation>
+                    <xs:documentation>The nodes to be added will be inserted as the first child of the anchor node.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-            <xs:enumeration value="preceding-sibling">
+            <xs:enumeration value="last-child">
                 <xs:annotation>
-                    <xs:documentation>The nodes to be added will be inserted into the first position of the preceding-sibling axis of the anchor node.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="child">
-                <xs:annotation>
-                    <xs:documentation>The nodes to be added will be inserted into the first position of the child axis of the anchor node.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="@">
-                <xs:annotation>
-                    <xs:documentation>The short notation of <icode type="attributeValue">attribute</icode>.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="attribute">
-                <xs:annotation>
-                    <xs:documentation>If the nodes to be added are attributes, the value of the axis must be <icode type="attributeValue">attribute</icode> or <icode type="attributeValue">@</icode>.</xs:documentation>
+                    <xs:documentation>The nodes to be added will be inserted as the last child of the anchor node.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
         </xs:restriction>
@@ -430,7 +479,7 @@
             </xs:enumeration>
             <xs:enumeration value="attribute">
                 <xs:annotation>
-                    <xs:documentation>The node to be added will be an attribute. The <icode type="attribute">axis</icode> attribute should have the value <icode type="attributeValue">@</icode>.</xs:documentation>
+                    <xs:documentation>The node to be added will be an attribute. The <icode type="attribute">position</icode> attribute should not be set.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
             <xs:enumeration value="processing-instruction">

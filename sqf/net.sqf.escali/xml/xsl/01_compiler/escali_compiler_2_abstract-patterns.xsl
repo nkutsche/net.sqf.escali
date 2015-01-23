@@ -20,6 +20,7 @@
     -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" exclude-result-prefixes="xs xd sch axsl es" version="2.0">
     <xsl:include href="escali_compiler_2_sqf-user-entry.xsl"/>
+    <xsl:include href="escali_compiler_0_functions.xsl"/>
 
     <xd:doc scope="stylesheet">
         <xd:desc>
@@ -79,11 +80,10 @@
         <xsl:choose>
             <xsl:when test="not($template)">
                 <xsl:message>The called pattern <xsl:value-of select="@is-a"/> is not available or no abstract pattern.</xsl:message>
-                <xsl:comment>The called pattern <xsl:value-of select="@is-a"/> is not available or no abstract pattern.</xsl:comment>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:apply-templates select="$template" mode="resolvePattern">
-                    <xsl:with-param name="id" select="@id"/>
+                    <xsl:with-param name="id" select="if (@id) then (@id) else ($es-id)"/>
                     <xsl:with-param name="es-id" select="$es-id"/>
                     <xsl:with-param name="params" select="sch:param"/>
                 </xsl:apply-templates>
@@ -121,7 +121,7 @@
     -->
     <xsl:template match="@*" mode="resolvePattern" priority="10">
         <xsl:param name="params" select="()" tunnel="yes" as="node()*"/>
-        <xsl:attribute name="{name()}">
+        <xsl:attribute name="{local-name()}" namespace="{namespace-uri()}">
             <xsl:call-template name="resolveAttribute">
                 <xsl:with-param name="value" select="."/>
                 <xsl:with-param name="params" select="$params"/>
@@ -139,8 +139,8 @@
         <xsl:variable name="resParam" select="$params[1]"/>
         <xsl:choose>
             <xsl:when test="count($params) > 0">
-                <xsl:variable name="paramName">
-                    <xsl:analyze-string select="$resParam/@name" regex="[-\[\]()*+?.,\\^$|#]">
+                <xsl:variable name="paramName" select="es:quoteRegex($resParam/@name)">
+                    <!--<xsl:analyze-string select="$resParam/@name" regex="[-\[\]()*+?.,\\^$|#]">
                         <xsl:matching-substring>
                             <xsl:text>\</xsl:text>
                             <xsl:value-of select="."/>
@@ -148,7 +148,7 @@
                         <xsl:non-matching-substring>
                             <xsl:value-of select="."/>
                         </xsl:non-matching-substring>
-                    </xsl:analyze-string>
+                    </xsl:analyze-string>-->
                 </xsl:variable>
                 <xsl:variable name="value">
                     <xsl:analyze-string select="$value" regex="\${$paramName}">

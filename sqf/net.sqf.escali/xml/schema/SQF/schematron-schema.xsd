@@ -6,6 +6,8 @@
         provided this notice is included in all copies.
 -->
 <!--
+    
+    
     This file is addapted for the Escali Schematron from Nico Kutscherauer.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:es="http://www.escali.schematron-quickfix.com/" elementFormDefault="qualified" xmlns:sqf="http://www.schematron-quickfix.com/validator/process" targetNamespace="http://purl.oclc.org/dsdl/schematron" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xml:lang="en">
@@ -269,7 +271,7 @@
                         <xs:element ref="sch:assert"/>
                         <xs:element ref="sch:report"/>
                         <xs:element ref="sch:extends"/>
-                        <xs:element ref="sqf:fix"/>
+                        <xs:group ref="sqf:fixElements"/>
                     </xs:choice>
                 </xs:choice>
             </xs:choice>
@@ -337,6 +339,7 @@
     <xs:group name="foreign-element">
         <xs:choice>
             <xs:any namespace="http://www.w3.org/1999/XSL/Transform" processContents="skip"/>
+<!--            <xs:any namespace="http://oxygenxml.com/ns/schematron/params" processContents="skip"/>-->
             <xs:any namespace="##local" processContents="skip"/>
         </xs:choice>
     </xs:group>

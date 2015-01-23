@@ -19,14 +19,14 @@
 
     -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:sch="http://purl.oclc.org/dsdl/schematron" exclude-result-prefixes="xs xd sch" version="2.0">
-    
+
     <xd:doc scope="stylesheet">
         <xd:desc>
             <xd:p><xd:b>Created on:</xd:b> Nov 19, 2013</xd:p>
             <xd:p><xd:b>Author:</xd:b> Nico Kutscherauer</xd:p>
         </xd:desc>
     </xd:doc>
-    
+
     <xd:doc scope="version">
         <xd:desc>
             <xd:p>Version information</xd:p>
@@ -42,12 +42,12 @@
             </xd:ul>
         </xd:desc>
     </xd:doc>
-    
-    
-    
+
+
+
     <xsl:key name="phaseByActivePatternId" match="sch:phase" use="es:getRefPhases(.)/sch:active/@pattern"/>
     <xsl:key name="phaseByInactivePatternId" match="sch:phase" use="es:getRefPhases(.)/es:inactive/@pattern"/>
-    
+
     <xsl:key name="nodeById" match="*[@id | @xml:id]" use="@id | @xml:id"/>
 
     <!--  
@@ -75,7 +75,7 @@
             <xsl:when test="$deactivatePhase/@id = $phase">
                 <xsl:sequence select="false()"/>
             </xsl:when>
-            <xsl:when test="$phaseEl and not($phaseEl/sch:active)">
+            <xsl:when test="$phaseEl and not($phaseEl/sch:active) and $phaseEl/es:inactive">
                 <xsl:sequence select="es:getActiveDefault($pattern, true())"/>
             </xsl:when>
             <xsl:when test="not($pattern/@id) or not($callingPhase)">
@@ -86,7 +86,7 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
-    
+
     <xsl:function name="es:getActiveDefault" as="xs:boolean">
         <xsl:param name="pattern" as="element()"/>
         <xsl:param name="default" as="xs:boolean"/>
@@ -94,16 +94,16 @@
                             then (true()) 
                          else if ($pattern/@es:active[.!='auto']) 
                             then ($pattern/@es:active = 'true') 
-                            else ($default)"></xsl:sequence>
+                            else ($default)"/>
     </xsl:function>
-<!--  
+    <!--  
         es extension:
         resolves references from phases to other phases
         respects the es:phase elements (with @ref) as childs of sch:phase
     -->
     <xsl:function name="es:getRefPhases" as="node()*">
         <xsl:param name="phase" as="element(sch:phase)*"/>
-        
+
         <xsl:variable name="refPhases" select="for $ph 
                                                 in $phase 
                                             return key('nodeById', $ph/es:phase/@ref, root($ph))"/>
@@ -111,10 +111,10 @@
         <xsl:variable name="refNewPhases" select=" if (exists($newPhases)) then (es:getRefPhases(($newPhases union $phase)) except ($newPhases, $phase)) else ()"/>
         <xsl:sequence select="$phase, $newPhases, $refNewPhases"/>
     </xsl:function>
-    
-    
-    
-    
+
+
+
+
     <xsl:function name="es:getNodePath">
         <xsl:param name="node"/>
         <xsl:variable name="ancestor">
@@ -153,14 +153,35 @@
         <xsl:param name="axis" select="''"/>
         <xsl:param name="type">*</xsl:param>
         <xsl:variable name="name" select="name()"/>
-        <xsl:value-of select="concat('/', $axis, $type)"/>
+        <xsl:variable name="local-name" select="local-name()"/>
+        <xsl:variable name="ns-uri" select="namespace-uri()"/>
+        <xsl:text>/</xsl:text>
+        <xsl:choose>
+            <xsl:when test="$type = '*'">
+                <xsl:value-of select="$axis"/>
+                <xsl:text>*:</xsl:text>
+                <xsl:value-of select="local-name()"/>
+                <xsl:text>[namespace-uri()='</xsl:text>
+                <xsl:value-of select="namespace-uri()"/>
+                <xsl:text>']</xsl:text>
+            </xsl:when>
+            <xsl:when test="$type = 'processing-instruction()'">
+                <xsl:text>processing-instruction()[local-name()='</xsl:text>
+                <xsl:value-of select="local-name()"/>
+                <xsl:text>']</xsl:text>
+            </xsl:when>
+            <xsl:when test="$type = ('comment()', 'text()')">
+                <xsl:value-of select="$type"/>
+            </xsl:when>
+        </xsl:choose>
+        <!--<xsl:value-of select="concat('/', $axis, $type)"/>
         <xsl:if test="not($type = ('comment()', 'text()'))">
             <xsl:text>[namespace-uri()='</xsl:text>
             <xsl:value-of select="namespace-uri()"/>
             <xsl:text>'][local-name()='</xsl:text>
             <xsl:value-of select="local-name()"/>
             <xsl:text>']</xsl:text>
-        </xsl:if>
+        </xsl:if>-->
         <xsl:text>[</xsl:text>
         <xsl:choose>
             <xsl:when test="$type= 'text()'">
@@ -170,12 +191,28 @@
                 <xsl:value-of select="count(preceding-sibling::comment())+1"/>
             </xsl:when>
             <xsl:when test="$type= 'processing-instruction()'">
-                <xsl:value-of select="count(preceding-sibling::processing-instruction()[name()=$name])+1"/>
+                <xsl:value-of select="count(preceding-sibling::processing-instruction()[local-name()=$local-name])+1"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="count(preceding-sibling::*[name()=$name])+1"/>
+                <xsl:value-of select="count(preceding-sibling::*[local-name() = $local-name][namespace-uri() = $ns-uri])+1"/>
             </xsl:otherwise>
         </xsl:choose>
         <xsl:text>]</xsl:text>
     </xsl:template>
+
+    <xsl:function name="es:quoteRegex" as="xs:string">
+        <xsl:param name="regex" as="xs:string"/>
+        <xsl:variable name="quoted" as="xs:string*">
+            <xsl:analyze-string select="$regex" regex="[-\[\]()*+?.,\\^$|#]">
+                <xsl:matching-substring>
+                    <xsl:text>\</xsl:text>
+                    <xsl:value-of select="."/>
+                </xsl:matching-substring>
+                <xsl:non-matching-substring>
+                    <xsl:value-of select="."/>
+                </xsl:non-matching-substring>
+            </xsl:analyze-string>
+        </xsl:variable>
+        <xsl:sequence select="string-join($quoted, '')"/>
+    </xsl:function>
 </xsl:stylesheet>

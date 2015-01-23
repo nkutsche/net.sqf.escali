@@ -19,7 +19,7 @@
 
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" exclude-result-prefixes="xs xd sch svrl" xmlns:sch="http://purl.oclc.org/dsdl/schematron" version="2.0">
-    <xsl:include href="escali_compiler_3_sqf-main.xsl"/>
+    <xsl:include href="escali_compiler_3_sqf-main_2.xsl"/>
 
 
     <xd:doc scope="stylesheet">
@@ -110,7 +110,9 @@
 
             <axsl:include href="{resolve-uri('escali_compiler_0_functions.xsl')}"/>
             <xsl:call-template name="topLevelValidatorExtension"/>
-            <axsl:template match="/">
+            
+            <axsl:variable name="es:base-uri-root" select="base-uri(/)"/>
+            <axsl:template match="/" priority="10000000">
                 <svrl:schematron-output xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sch="http://purl.oclc.org/dsdl/schematron" xmlns:svrl="http://purl.oclc.org/dsdl/svrl">
                     <xsl:if test="sch:title">
                         <xsl:attribute name="title" select="sch:title" separator=", "/>
@@ -146,7 +148,7 @@
                             </svrl:active-pattern>
                         </xsl:if>
                     </xsl:for-each>
-                    <axsl:apply-templates/>
+                    <axsl:next-match/>
                 </svrl:schematron-output>
             </axsl:template>
             <xsl:apply-templates select="node() except $firsts"/>
@@ -219,6 +221,9 @@
             <xsl:attribute name="priority" select="es:getPriority(.)+10"/>
             <xsl:call-template name="namespace"/>
             <axsl:param name="precId" select="()" as="xs:string*"/>
+            
+            <axsl:variable name="es:base-uri" select="base-uri(if (. instance of element()) then (.) else (..))"/>
+            
             <xsl:variable name="patternId" select="parent::sch:pattern/@es:id"/>
             <axsl:choose>
                 <axsl:when test="'{$matchType}'=('', 'first', 'priority') and '{$patternId}'=$precId"/>
@@ -228,6 +233,7 @@
                                              else (@context)}" es:patternId="{$patternId}" es:id="{@es:id}">
                         <xsl:copy-of select="@flag | @id | @es:icon | @es:link"/>
                         <xsl:call-template name="getRoleFlag"/>
+                        
                     </svrl:fired-rule>
                     <xsl:apply-templates/>
                 </axsl:otherwise>
@@ -271,13 +277,16 @@
             <xsl:value-of select="$contextPath"/>
             <xsl:text>)}</xsl:text>
         </xsl:attribute>
+        
         <xsl:attribute name="es:id">
             <xsl:text>{generate-id(self::node())}_</xsl:text>
             <xsl:value-of select="$messageId"/>
         </xsl:attribute>
         <xsl:attribute name="es:patternId" select="parent::*/parent::sch:pattern/@es:id"/>
         <xsl:call-template name="getRoleFlag"/>
-
+        <axsl:if test="$es:base-uri != $es:base-uri-root">
+            <axsl:attribute name="xml:base" select="$es:base-uri"/>
+        </axsl:if>
         <axsl:attribute name="test">
             <xsl:value-of select="@test"/>
         </axsl:attribute>
@@ -331,7 +340,7 @@
     </xsl:template>
 
     <xsl:template match="sch:span|sch:dir|sch:emph">
-        <xsl:element name="qvrl:{local-name(.)}">
+        <xsl:element name="es:{local-name(.)}">
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="node()"/>
         </xsl:element>

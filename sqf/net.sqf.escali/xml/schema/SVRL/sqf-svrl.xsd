@@ -119,10 +119,13 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="svrl:text" maxOccurs="unbounded"/>
+                <xs:element ref="sqf:title"/>
+                <xs:element ref="svrl:text" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="title" type="xs:string"/>
+    
     <xs:element name="sheet">
         <xs:annotation>
             <xs:documentation>Contains the QuickFix-specific XSLT elements of the manipulator.</xs:documentation>
