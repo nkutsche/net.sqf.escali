@@ -197,11 +197,11 @@
         <xsl:variable name="docPath" select="$splitetPath[1]"/>
         <xsl:variable name="docAbsPath" select="resolve-uri($docPath, document-uri(/))"/>
         <xsl:choose>
-            <xsl:when test="not(doc-available($docPath) or $docPath = '')">
-                <xsl:message terminate="no">Document <xsl:value-of select="$docPath"/> is not available!</xsl:message>
+            <xsl:when test="not(doc-available($docAbsPath) or $docPath = '')">
+                <xsl:message terminate="no">Document <xsl:value-of select="$docAbsPath"/> is not available!</xsl:message>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="doc" select="doc($docPath)" as="document-node()"/>
+                <xsl:variable name="doc" select="doc($docAbsPath)" as="document-node()"/>
                 <xsl:variable name="id" select="$splitetPath[2]" as="xs:string?"/>
                 <xsl:variable name="includeElement" select=" if (key('nodeById', $id, $doc)) 
                                                            then (key('nodeById', $id, $doc)) 

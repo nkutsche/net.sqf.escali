@@ -88,8 +88,9 @@
                             </xsl:variable>
                             <xsl:for-each-group select="$rules" group-by="@es:id">
                                 <es:rule>
+                                    <xsl:apply-templates select="@xml:base"/>
                                     <es:meta>
-                                        <xsl:apply-templates select="@*"/>
+                                        <xsl:apply-templates select="@* except @xml:base"/>
                                         <xsl:apply-templates select="key('paraByRefid', current-grouping-key(), $root)"/>
                                     </es:meta>
                                     <xsl:copy-of select="current-group()/node()"/>
