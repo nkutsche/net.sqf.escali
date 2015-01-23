@@ -23,7 +23,7 @@ escali_dir=$(readlink -f $(dirname $0))
 source=$(readlink -f $1)
 schema=$(readlink -f $2)
 
-calabash=$escali_dir/lib/calabash/
+calabash=$escali_dir/lib/calabash-es-1.0.11/
 
 if [ -n "$3" ]; 
 then 
@@ -72,14 +72,14 @@ if [ -n "$3" ];
 			echo      [user-entry] other-entry This is another user entry
 			echo 
 			echo In order to set the value of the user entry type it using following pattern:
-			echo entry-name=\"[value]\"\;other-entry=\"[next-value]\"
+			echo entry-name=[value]\;other-entry=[next-value]
 			echo 
 			echo If the QuickFix does not have user entries just use the [enter] key
 			echo 
 			read -p "Enter the user entries of the fixes:" entries
 		fi
 
-		java -cp "calabash.jar" com.xmlcalabash.drivers.Main --input config=$config $escali_dir/xml/xproc/escali-quickFix.xpl fixId=$fix_id userEntries=$entries system="sh"
+		java -cp "calabash.jar" com.xmlcalabash.drivers.Main --input config=$config $escali_dir/xml/xproc/escali-quickFix.xpl fixId=$fix_id userEntries="$entries" system="sh"
 
 		cp $escali_dir/temp/tempOutput.xml $out
 		

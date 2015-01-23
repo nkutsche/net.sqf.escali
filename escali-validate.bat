@@ -1,4 +1,4 @@
-REM @echo off
+@echo off
 
 REM 	Copyright (c) 2014 Nico Kutscherauer
 	
@@ -22,11 +22,10 @@ REM 	along with Escali Schematron.  If not, see http://www.gnu.org/licenses/gpl-
 
 set CALL_DIR=%CD%
 set ESCALI_DIR=%~dp0
-
 set SOURCE=%~f1
 set SCHEMA=%~f2
 
-set CALABASH=%ESCALI_DIR%lib\calabash\
+set CALABASH=%ESCALI_DIR%lib\calabash-es-1.0.11\
 set OUT=%~f3
 set CONFIG=%ESCALI_DIR%META-INF\config.xml
 set HTML=%ESCALI_DIR%temp\report.html
@@ -36,9 +35,9 @@ set USER_ENTRY=%4
 cd %CALABASH%
 
 
-java -cp "calabash.jar; lib/" com.xmlcalabash.drivers.Main --input source=%SOURCE% --input schema=%SCHEMA% --input config=%CONFIG% --output html=%HTML% %ESCALI_DIR%xml\xproc\escali-validation.xpl
+java -cp "calabash.jar; lib/" com.xmlcalabash.drivers.Main --input source="%SOURCE%" --input schema="%SCHEMA%" --input config="%CONFIG%" --output html="%HTML%" "%ESCALI_DIR%xml\xproc\escali-validation.xpl"
 
-%HTML%
+"%HTML%"
 
 if "%3"=="" goto eop
 
@@ -71,7 +70,7 @@ echo      [user-entry] entry-name  This is an user entry
 echo      [user-entry] other-entry This is another user entry
 echo.
 echo In order to set the value of the user entry type it using following pattern:
-echo entry-name="[value]";other-entry="[next-value]"
+echo entry-name=[value];other-entry=[next-value]
 echo.
 echo. If the QuickFix does not have user entries just use the [enter] key
 echo.
@@ -79,9 +78,9 @@ set /p ENTRIES=Enter the user entries of the fixes:
 echo.
 
 :fix
-java -cp "calabash.jar; lib/" com.xmlcalabash.drivers.Main --input config=%CONFIG% %ESCALI_DIR%xml\xproc\escali-quickFix.xpl fixId=%FIX_ID% userEntries=%ENTRIES%
+java -cp "calabash.jar; lib/" com.xmlcalabash.drivers.Main --input config="%CONFIG%" "%ESCALI_DIR%xml\xproc\escali-quickFix.xpl" fixId="%FIX_ID%" userEntries="%ENTRIES%"
 
-copy %ESCALI_DIR%temp\tempOutput.xml %OUT%
+copy "%ESCALI_DIR%temp\tempOutput.xml" "%OUT%"
 
 :eop
 
