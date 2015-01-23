@@ -22,7 +22,7 @@ public class Flag extends ModelNode implements _Flag{
 	}
 	
 	Flag(Node node, int svrlIdx, int index) throws DOMException, URISyntaxException {
-		super(svrlIdx);
+		super(svrlIdx, node.getBaseURI());
 		this.setId(node.getNodeValue());
 		this.setName(node.getNodeValue());
 		this.setIndex(index);

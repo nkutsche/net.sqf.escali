@@ -38,8 +38,8 @@ public class SVRLReport {
 	
 	public static XPathReader XPR = new XPathReader();
 
-	private XSLTPipe htmlPrinter = new XSLTPipe();
-	private XSLTPipe textPrinter = new XSLTPipe();
+	private XSLTPipe htmlPrinter = new XSLTPipe("Escali HTML output");
+	private XSLTPipe textPrinter = new XSLTPipe("Escali text output");
 	
 	private final StringNode svrl;
 	
@@ -54,7 +54,7 @@ public class SVRLReport {
 	private StringNode escaliReport;
 	
 	public SVRLReport(TextSource svrl, TextSource input, TextSource schema, EscaliRsourcesInterface resource) throws TransformerConfigurationException, IOException, SAXException, XMLStreamException, XPathExpressionException, DOMException, URISyntaxException{
-		XSLTPipe escaliReporter = new XSLTPipe();
+		XSLTPipe escaliReporter = new XSLTPipe("Escali SVRL output");
 		
 		htmlPrinter.addStep(resource.getSvrlPrinter("html"));
 		textPrinter.addStep(resource.getSvrlPrinter("text"));

@@ -58,6 +58,12 @@ public class EscaliFileResources implements EscaliRsourcesInterface {
 		return getInputStream(compFolder, paths);	
 	}
 	
+	public Source[] getPreCompiler() throws FileNotFoundException{
+		File compFolder = new File(escaliFolder, "01_compiler");
+		String[] paths = {"escali_compiler_0_validate.xsl"};
+		return getInputStream(compFolder, paths);	
+	}
+	
 //	
 //	Validator
 //	
@@ -77,5 +83,17 @@ public class EscaliFileResources implements EscaliRsourcesInterface {
 	
 	public Source getResolver() throws FileNotFoundException{
 		return getInputStream(resolverFolder, "escali_resolver_1_main.xsl");
+	}
+
+	@Override
+	public Source getSchematronSchema() throws FileNotFoundException {
+		File folder = new File(baseFolder, "xml/schema/SQF");
+		return getInputStream(folder, "schematron-schema.xsd");
+	}
+
+	@Override
+	public Source getSchematronForSchematron() throws FileNotFoundException {
+		File folder = new File(baseFolder, "xml/schema/SQF");
+		return getInputStream(folder, "sqf.sch");
 	}
 }

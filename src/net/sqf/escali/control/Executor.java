@@ -15,6 +15,7 @@ import net.sqf.escali.control.report._UserEntry;
 import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
+import net.sqf.utils.process.exceptions.CancelException;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 import net.sqf.xmlUtils.xslt.Parameter;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
@@ -22,13 +23,16 @@ import net.sqf.xsm.operations.PositionalReplace;
 
 public class Executor {
 	
-	private XSLTPipe resolver = new XSLTPipe();
+	private XSLTPipe resolver = new XSLTPipe("");
 	
 	public Executor(EscaliRsourcesInterface resource) throws TransformerConfigurationException, FileNotFoundException{
 		resolver.addStep(resource.getResolver());
 	}
-	
-	public TextSource execute(_QuickFix[] fixes, SVRLReport report, TextSource input, Config config) throws TransformerConfigurationException{
+
+	public TextSource execute(_QuickFix[] fixes, SVRLReport report, Config config) throws TransformerConfigurationException{
+		return execute(fixes, report.getInput(), report.getSVRL(), config);
+	}
+	public TextSource execute(_QuickFix[] fixes, TextSource input, TextSource svrl, Config config) throws TransformerConfigurationException{
 		String[] ids = new String[fixes.length];
 		ArrayList<Parameter> ueParams = new ArrayList<Parameter>();
 		for (int i = 0; i < ids.length; i++) {
@@ -39,10 +43,10 @@ public class Executor {
 			}
 		}
 		
-		XSLTPipe manipulator = new XSLTPipe();
+		XSLTPipe manipulator = new XSLTPipe("");
 		ArrayList<Parameter> params = new ArrayList<Parameter>();
 		params.add(new Parameter("id", ids));
-		TextSource resolverXSL = resolver.pipe(report.getSVRL(), params); 
+		TextSource resolverXSL = resolver.pipe(svrl, params); 
 		manipulator.addStep(resolverXSL, ueParams);
 		TextSource resolverResult = manipulator.pipe(input, config.createManipulatorParams());
 		
@@ -57,6 +61,8 @@ public class Executor {
 			} catch (XMLStreamException e) {
 				return input;
 			} catch (XPathExpressionException e) {
+				return input;
+			} catch (CancelException e) {
 				return input;
 			}
 		} else {

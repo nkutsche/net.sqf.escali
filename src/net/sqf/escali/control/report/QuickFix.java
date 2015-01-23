@@ -40,8 +40,6 @@ public class QuickFix extends MessageGroup implements _QuickFix {
 		this.setId(SVRLReport.XPR.getAttributValue(node, "id"));
 		this.setIndex(index);
 		XPathReader xpathreader = new XPathReader();
-		NodeList texte = xpathreader.getNodeSet("sqf:description/es:text",
-				node);
 		
 		if(xpathreader.getBoolean("@default='true'", node)){
 			this.setDefault(true);
@@ -53,13 +51,17 @@ public class QuickFix extends MessageGroup implements _QuickFix {
 		
 		
 //		S E T   N A M E
-		String description = "";
-		for (int i = 0; i < texte.getLength(); i++) {
-			description += texte.item(i).getTextContent();
-			if (i + 1 < texte.getLength())
-				description += " ";
-		}
-		this.setName(description);
+		Node nameNode = xpathreader.getNode("sqf:description/sqf:title", node);
+//		NodeList texte = xpathreader.getNodeSet("sqf:description/es:text",
+//				node);
+//		String description = "";
+//		for (int i = 0; i < texte.getLength(); i++) {
+//			description += texte.item(i).getTextContent();
+//			if (i + 1 < texte.getLength())
+//				description += " ";
+//		}
+		this.setName(nameNode.getTextContent());
+		
 //		S E T   T Y P E
 		String type = SVRLReport.XPR.getAttributValue(node, "role");
 		int i;
@@ -88,7 +90,7 @@ public class QuickFix extends MessageGroup implements _QuickFix {
 		_UserEntry[] allParams = getParameter();
 		ArrayList<_UserEntry> settedParams = new ArrayList<_UserEntry>();
 		for(_UserEntry param : allParams){
-			if(param.isValueValid()){
+			if(param.isValueSet()){
 				settedParams.add(param);
 			}
 		}
@@ -96,9 +98,23 @@ public class QuickFix extends MessageGroup implements _QuickFix {
 	}
 	
 	@Override
+	public _UserEntry[] getInvalidParameter() {
+		_UserEntry[] allParams = getParameter();
+		ArrayList<_UserEntry> invalidParams = new ArrayList<_UserEntry>();
+		for(_UserEntry param : allParams){
+			if(!param.isValueValid()){
+				invalidParams.add(param);
+			}
+		}
+		return invalidParams.toArray(new _UserEntry[invalidParams.size()]);
+	}
+	
+	@Override
 	public boolean hasParameter() {
 		return getParameter().length > 0;
 	}
+	
+	
 
 	@Override
 	public String getFixId() {

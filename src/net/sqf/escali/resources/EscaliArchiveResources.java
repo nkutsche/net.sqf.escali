@@ -1,5 +1,6 @@
 package net.sqf.escali.resources;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
@@ -33,7 +34,7 @@ public class EscaliArchiveResources implements EscaliRsourcesInterface {
 	
 	public EscaliArchiveResources(String path){
 		this.path = path;
-		this.escaliFolder = path + "xml/xsl/";
+		this.escaliFolder = path + "xsl/";
 		this.valFolder = escaliFolder + "02_validator/";
 		this.resolverFolder = escaliFolder +  "03_resolver/";
 	}
@@ -42,7 +43,7 @@ public class EscaliArchiveResources implements EscaliRsourcesInterface {
 	}
 	
 	public Source getConfig() throws FileNotFoundException{
-		return getInputStream(path + "META-INF/", "config.xml");
+		return getInputStream(path, "config.xml");
 	}
 	
 	public Source getSchemaInfo() throws FileNotFoundException{
@@ -57,6 +58,12 @@ public class EscaliArchiveResources implements EscaliRsourcesInterface {
 	public Source[] getCompiler() throws FileNotFoundException{
 		String compFolder = escaliFolder + "01_compiler/";
 		String[] paths = {"escali_compiler_1_include.xsl", "escali_compiler_2_abstract-patterns.xsl", "escali_compiler_3_main.xsl"};
+		return getInputStream(compFolder, paths);	
+	}
+	
+	public Source[] getPreCompiler() throws FileNotFoundException{
+		String compFolder = escaliFolder + "01_compiler/";
+		String[] paths = {"escali_compiler_0_validate.xsl"};
 		return getInputStream(compFolder, paths);	
 	}
 	
@@ -79,6 +86,16 @@ public class EscaliArchiveResources implements EscaliRsourcesInterface {
 	
 	public Source getResolver() throws FileNotFoundException{
 		return getInputStream(resolverFolder, "escali_resolver_1_main.xsl");
+	}
+
+	@Override
+	public Source getSchematronSchema() throws FileNotFoundException {
+		return getInputStream(this.path + "schema/SQF/", "schematron-schema.xsd");
+	}
+	
+	@Override
+	public Source getSchematronForSchematron() throws FileNotFoundException {
+		return getInputStream(this.path + "schema/SQF/", "sqf.sch");
 	}
 
 }

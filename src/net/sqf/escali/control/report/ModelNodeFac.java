@@ -1,17 +1,22 @@
 package net.sqf.escali.control.report;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
 
+import net.sqf.stringUtils.TextSource;
 import net.sqf.xmlUtils.staxParser.StringNode;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 public class ModelNodeFac {
 	private _Report report;
@@ -60,6 +65,19 @@ public class ModelNodeFac {
 		fixCount = 0;
 		userEntryCount = 0;
 		diagnosticCount = 0;
+	}
+	
+	public _Report getDummyReport(String phase, String schema, StringNode instance, String title) throws IOException, SAXException, XMLStreamException, DOMException, XPathExpressionException, URISyntaxException {
+		String esReport = "<es:escali-reports><es:meta>" +
+				"<es:title>" + title + "</es:title>" +
+				"<es:schema>" + schema + "</es:schema>" +
+				"<es:instance>" + instance.getAbsPath() + "</es:instance>" +
+				"<es:phase>" + phase + "</es:phase>" +
+				"</es:meta><es:escali-reports>";
+		TextSource esReportTS = TextSource.createVirtualTextSource(File.createTempFile("escali", ".xml"));
+		esReportTS.setData(esReport);
+		StringNode esReportSN = new StringNode(esReportTS);
+		return getReport(esReportSN.getNode("/es:escali-reports"), instance);
 	}
 
 	public _Report getReport(Node node, StringNode instance) throws DOMException,

@@ -26,8 +26,11 @@ public interface _QuickFix extends _ModelNode {
     String getId(int idType);
     String getId();
     boolean isDefault();
+    
     _UserEntry[] getParameter();
     _UserEntry[] getSettedParameter();
+    _UserEntry[] getInvalidParameter();
+
     boolean hasParameter();
     int getRole();
 	_QuickFix[] getFixRelFixes();

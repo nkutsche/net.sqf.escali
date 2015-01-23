@@ -7,6 +7,7 @@ public interface _ModelNode {
 	void setId(String id);
 	String toString();
 	_ModelNode getParent();
+	String getBaseUri();
 	ArrayList<_ModelNode> getChildren();
 	String getId();
 	void setName(String name);
@@ -23,6 +24,9 @@ public interface _ModelNode {
 	String getName();
 	int getChildCount();
 	double getErrorLevel();
+	
+	ArrayList<_ModelNode> getChildById(String[] ids);
+	_ModelNode getChildById(String id);
 
 
 }

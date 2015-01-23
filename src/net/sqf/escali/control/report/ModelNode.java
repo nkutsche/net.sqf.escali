@@ -3,7 +3,9 @@ package net.sqf.escali.control.report;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import net.sqf.escali.control.SVRLReport;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
@@ -13,10 +15,12 @@ import org.w3c.dom.Node;
 
 abstract class ModelNode implements _ModelNode {
 	private final URI icon;
+	private final String baseUri;
 	private boolean hasIcon = false;
 	private final URI link;
 	private boolean hasLink = false;
-	private final ArrayList<_ModelNode> children = new ArrayList<_ModelNode>();
+//	private final ArrayList<_ModelNode> children = new ArrayList<_ModelNode>();
+	private final LinkedHashMap<String, _ModelNode> childrenByID = new LinkedHashMap<String, _ModelNode>();
 	private _ModelNode parent;
 	private boolean hasParent = false;
 	private String id;
@@ -34,15 +38,18 @@ abstract class ModelNode implements _ModelNode {
 				ProcessNamespaces.ES_NS));
 		if (!link.equals(new URI("")))
 			this.hasLink = true;
+		
+		this.baseUri = node.getBaseURI();
 
 	}
 
-	public ModelNode(int svrlIdx) {
+	public ModelNode(int svrlIdx, String baseUri) {
 		this.svrlIdx = svrlIdx;
 		this.icon = null;
 		this.hasIcon = false;
 		this.link = null;
 		this.hasLink = false;
+		this.baseUri = baseUri;
 	}
 
 	// ID
@@ -77,14 +84,40 @@ abstract class ModelNode implements _ModelNode {
 	// C H I L D R E N
 	@Override
 	public ArrayList<_ModelNode> getChildren() {
-		// TODO Auto-generated method stub
-		return this.children;
+		ArrayList<_ModelNode> nodes = new ArrayList<_ModelNode>(this.childrenByID.values());
+		return nodes;
 	}
+	@Override
+	public ArrayList<_ModelNode> getChildById(String[] ids){
+		ArrayList<_ModelNode> children = new ArrayList<_ModelNode>();
+		for (String id : ids) {
+			_ModelNode child = this.getChildById(id);
+			if(child != null){
+				children.add(child);
+			}
+		}
+		return children;
+	}
+	@Override
+	public _ModelNode getChildById(String id){
+		if(this.childrenByID.containsKey(id)){
+			return this.childrenByID.get(id);
+		} else {
+			for (_ModelNode child : this.getChildren()) {
+				_ModelNode selChild = child.getChildById(id);
+				if(selChild != null){
+					return selChild;
+				}
+			}
+			return null;
+		}
+	}
+	
 
 	@Override
 	public void addChild(_ModelNode child) {
 		child.setParent(this);
-		children.add(child);
+		this.childrenByID.put(child.getId(), child);
 	}
 
 	@Override
@@ -98,7 +131,7 @@ abstract class ModelNode implements _ModelNode {
 
 	@Override
 	public int getChildCount() {
-		return children.size();
+		return this.childrenByID.size();
 	}
 
 	// N A M E
@@ -157,5 +190,10 @@ abstract class ModelNode implements _ModelNode {
 	public String toString() {
 		return getName();
 	}
-
+	
+	@Override
+	public String getBaseUri() {
+		// TODO Auto-generated method stub
+		return this.baseUri;
+	}
 }
