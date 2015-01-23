@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="xml-source"/>
+	<classpathentry kind="src" path="META-INF"/>
+	<classpathentry kind="src" path="xml"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sqf.xmlUtils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sqf.stringUtils"/>
-	<classpathentry kind="lib" path="/net.sqf.xmlUtils/lib/woodstox-core-lgpl-4.2.0.jar"/>
+	<classpathentry kind="lib" path="/net.sqf.xmlUtils/lib/woodstox-core-lgpl-4.2.0.jar" sourcepath="/woodstox-4.2.0/src/java"/>
+	<classpathentry kind="lib" path="lib/joda-time-2.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sqf.xsm"/>
+	<classpathentry kind="src" path="/net.sqf.utils.process"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
