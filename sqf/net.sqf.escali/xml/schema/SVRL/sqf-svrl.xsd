@@ -87,10 +87,10 @@
             <xs:attribute name="id" use="required" type="xs:ID">
                 <xs:annotation>
                     <xs:documentation>Is used for the unique identification of a QuickFix (ID). Each QuickFix within a SVRL report must have an unique ID.</xs:documentation>
-                    <xs:documentation>The resolver uses this ID in order to activate the QuickFix.</xs:documentation>
+                    <xs:documentation>The extractor uses this ID in order to activate the QuickFix.</xs:documentation>
                     <xs:documentation>The ID consists of the three other ID attributes (<icode type="attribute">contextID</icode>, <icode type="attribute">fixID</icode> and <icode type="attribute">messageID</icode>) separated by dashes and becomes unique in this way.</xs:documentation>
                     <xs:documentation xml:lang="de">Dient zur eindeutigen Identifikation eines QuickFixes (ID). Kein QuickFix innerhalb eines SVRL-Reports darf die gleiche ID haben.</xs:documentation>
-                    <xs:documentation xml:lang="de">Der Resolver verwendet diese ID zur aktivierung des QuickFixes.</xs:documentation>
+                    <xs:documentation xml:lang="de">Der Extractor verwendet diese ID zur aktivierung des QuickFixes.</xs:documentation>
                     <xs:documentation xml:lang="de">Die ID setzt sich aus den drei weiteren IDs (<icode type="attribute">contextID</icode>, <icode type="attribute">fixID</icode> und <icode type="attribute">messageID</icode>), getrennt durch Bindestriche, zusammen und wird so eindeutig.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>

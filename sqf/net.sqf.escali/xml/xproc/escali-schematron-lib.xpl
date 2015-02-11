@@ -300,9 +300,9 @@
         <p:output port="result" primary="true"/>
         <p:option name="fixId"/>
         <p:option name="xml-save-mode" select="'false'"/>
-        <p:xslt name="resolver">
+        <p:xslt name="extractor">
             <p:input port="stylesheet">
-                <p:document href="../xsl/03_resolver/escali_resolver_1_main.xsl"/>
+                <p:document href="../xsl/03_extractor/escali_extractor_1_main.xsl"/>
             </p:input>
             <p:with-param name="id" select="$fixId"/>
         </p:xslt>
@@ -311,7 +311,7 @@
                 <p:pipe port="source" step="es_quickFix"/>
             </p:input>
             <p:input port="stylesheet">
-                <p:pipe port="result" step="resolver"/>
+                <p:pipe port="result" step="extractor"/>
             </p:input>
             <p:input port="parameters">
                 <p:pipe port="params" step="es_quickFix"/>
