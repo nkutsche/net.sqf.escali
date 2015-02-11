@@ -43,7 +43,7 @@
         </xd:desc>
     </xd:doc>
     
-    <xsl:include href="escali_resolver_1_get-record.xsl"/>
+    <xsl:include href="escali_extractor_1_get-record.xsl"/>
     
     <xsl:param name="id" as="xs:string+" select="''"/>
     <xsl:param name="inputRecord" as="xs:string" select="''"/>
