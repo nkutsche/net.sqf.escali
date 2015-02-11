@@ -245,6 +245,7 @@
         <xsl:param name="messageId"/>
         <xsl:variable name="match" select="if (@match) then (@match) else ('self::node()')"/>
         <bxsl:template>
+            <xsl:apply-templates select="preceding-sibling::xsl:variable|preceding-sibling::sch:let|preceding-sibling::sqf:param[not(@user-entry='yes')]"/>
             <axsl:attribute name="match">
                 <xsl:call-template name="nodeMatching">
                     <xsl:with-param name="nodes" select="$match"/>
@@ -275,6 +276,7 @@
     <xsl:template match="sqf:add">
         <xsl:param name="messageId"/>
         <bxsl:template>
+            <xsl:apply-templates select="preceding-sibling::xsl:variable|preceding-sibling::sch:let|preceding-sibling::sqf:param[not(@user-entry='yes')]"/>
             <axsl:attribute name="match">
                 <xsl:call-template name="nodeMatching">
                     <xsl:with-param name="nodes" select=" if (@match) then (@match) else ('self::node()')"/>
@@ -343,6 +345,7 @@
         </bxsl:template>
         <xsl:if test="@position=('first-child','last-child') or not(@position)">
             <bxsl:template>
+                <xsl:apply-templates select="preceding-sibling::xsl:variable|preceding-sibling::sch:let|preceding-sibling::sqf:param[not(@user-entry='yes')]"/>
                 <axsl:variable name="match">
                     <xsl:call-template name="nodeMatching">
                         <xsl:with-param name="nodes" select=" if (@match) then (@match) else ('self::node()')"/>
