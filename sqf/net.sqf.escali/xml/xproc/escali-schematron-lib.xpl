@@ -31,6 +31,7 @@
         <p:option name="fixName"/>
         <p:option name="phase"/>
         <p:option name="xml-save-mode" select="'false'"/>
+        <p:option name="system" select="'bat'"/>
         <es:schematron name="validate">
             <p:input port="schema">
                 <p:pipe port="schema" step="es_validateAndFix"/>
@@ -82,6 +83,7 @@
                 <es:xsm name="xsm">
                     <p:with-option name="tempFolder" select="$sourceFolder"/>
                     <p:with-option name="xsmFolder" select="resolve-uri('../../../net.sqf.xsm/xsm/v0.1/')"/>
+                    <p:with-option name="system" select="$system"/>
                 </es:xsm>
 <!--                <p:sink name="xsm"/>-->
                 <p:load href="../../temp/tempOutput.xml" cx:depends-on="xsm"/>
