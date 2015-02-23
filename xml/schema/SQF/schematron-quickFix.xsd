@@ -334,7 +334,7 @@
         </xs:annotation>
         <xs:complexType mixed="true">
             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:group ref="sqf:foreign"/>
+                <xs:group ref="sch:foreign"/>
                 <xs:choice>
                     <xs:element ref="sch:name"/>
                     <xs:element ref="sch:value-of"/>
