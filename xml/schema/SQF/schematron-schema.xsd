@@ -38,11 +38,11 @@
         <xs:complexType>
             <xs:choice>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element ref="es:default-namespace" minOccurs="0"/>
+<!--                    <xs:element ref="es:default-namespace" minOccurs="0"/>-->
                     <xs:group ref="sch:foreign"/>
                     <xs:element ref="sch:include"/>
-                    <xs:element ref="es:import"/>
-                    <xs:element ref="es:param"/>
+<!--                    <xs:element ref="es:import"/>
+                    <xs:element ref="es:param"/>-->
                     <xs:choice>
                         <xs:element ref="sch:title"/>
                         <xs:element ref="sch:ns"/>
@@ -51,7 +51,7 @@
                         <xs:element ref="sch:phase"/>
                         <xs:element ref="sch:pattern"/>
                         <xs:element ref="sch:diagnostics"/>
-                        <xs:element ref="sqf:fixes"/>
+<!--                        <xs:element ref="sqf:fixes"/>-->
                     </xs:choice>
                 </xs:choice>
             </xs:choice>
@@ -227,8 +227,8 @@
                     <xs:element ref="sch:p"/>
                     <xs:element ref="sch:let"/>
                     <xs:element ref="sch:active"/>
-                    <xs:element ref="es:inactive"/>
-                    <xs:element ref="es:phase"/>
+<!--                    <xs:element ref="es:inactive"/>
+                    <xs:element ref="es:phase"/>-->
                 </xs:choice>
             </xs:choice>
             <xs:attribute name="id" use="required" type="xs:ID"/>
@@ -271,7 +271,7 @@
                         <xs:element ref="sch:assert"/>
                         <xs:element ref="sch:report"/>
                         <xs:element ref="sch:extends"/>
-                        <xs:group ref="sqf:fixElements"/>
+<!--                        <xs:group ref="sqf:fixElements"/>-->
                     </xs:choice>
                 </xs:choice>
             </xs:choice>
@@ -338,7 +338,10 @@
     </xs:attributeGroup>
     <xs:group name="foreign-element">
         <xs:choice>
-            <xs:any namespace="http://www.w3.org/1999/XSL/Transform" processContents="skip"/>
+<!--            <xs:any namespace="http://www.w3.org/1999/XSL/Transform" processContents="skip"/>-->
+            
+            <xs:any namespace="##other" processContents="strict"/>
+            
 <!--            <xs:any namespace="http://oxygenxml.com/ns/schematron/params" processContents="skip"/>-->
             <xs:any namespace="##local" processContents="skip"/>
         </xs:choice>
