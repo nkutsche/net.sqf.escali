@@ -74,6 +74,27 @@
             </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
+    
+    <xs:attributeGroup name="parameterAttributes">
+        <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>This attribute defines the name of the parameter or User Entry.</xs:documentation>
+                <xs:documentation source="Value">Must be unique within a QuickFix.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="default" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>This attribute defines a default value for a parameter or User Entry by using a XPath expression. If the attribute is set to a <icode type="element">sqf:param</icode> element, the element must be empty.</xs:documentation>
+                <xs:documentation source="Value">Must be a valid XPath expression.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="type" type="xs:string" use="optional">
+            <xs:annotation>
+                <xs:documentation>This attribute defines the type of the parameter or User Entry.</xs:documentation>
+                <xs:documentation source="Value">The value should be a valid XML Schema type.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:attributeGroup>
 
 
     <xs:group name="templateElements">
@@ -119,6 +140,7 @@
             </xs:choice>
             <xs:attribute ref="xml:lang"/>
             <xs:attribute name="id" type="xs:ID"/>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="group">
@@ -142,6 +164,7 @@
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute ref="xml:lang"/>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="fix">
@@ -150,12 +173,13 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
+                <xs:element ref="sqf:param" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:group ref="sch:foreign"/>
+                    <xs:group ref="sqf:foreign"/>
                     <xs:element ref="sch:let"/>
                 </xs:choice>
                 <xs:element ref="sqf:description"/>
-                <xs:group ref="sch:foreign"/>
+                <xs:group ref="sqf:foreign"/>
                 <xs:choice>
                     <xs:sequence>
                         <xs:element ref="sqf:call-fix"/>
@@ -164,7 +188,6 @@
                         <xs:choice minOccurs="0" maxOccurs="unbounded">
                             <xs:element ref="sch:let"/>
                             <xs:element ref="sqf:user-entry"/>
-                            <xs:element ref="sqf:param"/>
                         </xs:choice>
                         <xs:group ref="sqf:activityElements"/>
                     </xs:sequence>
@@ -199,6 +222,7 @@
                 </xs:simpleType>
             </xs:attribute>
             <xs:attribute ref="xml:lang"/>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="description">
@@ -211,6 +235,7 @@
                 <xs:element ref="sqf:p" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute ref="xml:lang"/>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="user-entry">
@@ -221,13 +246,9 @@
             <xs:sequence>
                 <xs:element ref="sqf:description"/>
             </xs:sequence>
-            <xs:attribute name="ref" type="xs:string" use="required">
-                <xs:annotation>
-                    <xs:documentation>The attribute refers to a <a ref="#sqf_param"><icode type="element">sqf:param</icode></a> element.</xs:documentation>
-                    <xs:documentation source="Value">The value has to be the name of a parameter which is within the same QuickFix.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
+            <xs:attributeGroup ref="sqf:parameterAttributes"/>
             <xs:attribute ref="xml:lang"/>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="call-fix">
@@ -245,6 +266,7 @@
                     <xs:documentation>This attribute refers to a QuickFix by using the ID. The referred QuickFix must be defined globally or for the same Schematron rule as the referring QuickFix.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="with-param">
@@ -253,6 +275,9 @@
             <xs:documentation>The content or the <icode type="attribute">select</icode> attribute define the value of the parameter. If there is content, the <icode type="element">sqf:with-param</icode> element should not have a <icode type="attribute">select</icode> attribute.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:any processContents="lax"/>
+            </xs:choice>
             <xs:attribute name="name" type="xs:string" use="required">
                 <xs:annotation>
                     <xs:documentation source="Value">The name of the referred parameter.</xs:documentation>
@@ -264,39 +289,23 @@
                     <xs:documentation source="Value">Must be a valid XPath expression.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="param">
         <xs:annotation>
-            <xs:documentation>This element defines a parameter for a QuickFix. The parameter can be used like a variable within the QuickFix. The value can be set by the <a ref="#sqf_with-param"><icode type="element">sqf:with-param</icode></a> element or manually by the user if the user entry is referred by a <a ref="#sqf_user-entry"><icode type="element">sqf:user-entry</icode></a> element.</xs:documentation>
+            <xs:documentation>This element defines a parameter for a QuickFix. The parameter can be used like a variable within the QuickFix. The value can be set by the <a ref="#sqf_with-param"><icode type="element">sqf:with-param</icode></a> element.</xs:documentation>
             <xs:documentation>The content defines a default value for the parameter.</xs:documentation>
+            <xs:documentation source="Exception">Abstract parameters (see attribute <icode type="attribute">abstract</icode>) can not used as normal XPath variables. An abstract parameter declares, that the current QuickFix uses a parameter of an abstract pattern. A QuickFix with one or more abstract parameters can just used by abstract patterns. The value of the parameter will be set by the instantiation of the abstract pattern according to the Schematron specification. The instantiation of the abstract pattern must specify a value for every abstract parameter of the QuickFix.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:any processContents="skip"/>
+                <xs:any processContents="lax"/>
             </xs:choice>
-            <xs:attribute name="name" type="xs:string" use="required">
-                <xs:annotation>
-                    <xs:documentation>This attribute defines the name of the parameter.</xs:documentation>
-                    <xs:documentation source="Value">Must be unique within a QuickFix.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="select" type="xs:string" use="optional">
-                <xs:annotation>
-                    <xs:documentation>This attribute defines a default value for the parameter by using a XPath expression. If the attribute is set, the <icode type="element">sqf:param</icode> element must be empty.</xs:documentation>
-                    <xs:documentation source="Value">Must be a valid XPath expression.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="as" type="xs:string" use="optional">
-                <xs:annotation>
-                    <xs:documentation>This attribute defines the type of the parameter.</xs:documentation>
-                    <xs:documentation source="Value">The value should be a valid XML Schema type.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
             <xs:attribute name="required" default="no">
                 <xs:annotation>
                     <xs:documentation>This attribute sets for the parameter whether it is optional or required.</xs:documentation>
-                    <xs:documentation>If the parameter is required, it cannot have a <icode type="attribute">select</icode> attribute or any content.</xs:documentation>
+                    <xs:documentation>If the parameter is required, it cannot have a <icode type="attribute">default</icode> attribute or any content.</xs:documentation>
                     <xs:documentation source="Value">The value <icode type="attributeValue">yes</icode> is used for required, <icode type="attributeValue">no</icode> for optional.</xs:documentation>
                 </xs:annotation>
                 <xs:simpleType>
@@ -306,6 +315,17 @@
                     </xs:restriction>
                 </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="abstract" type="xs:boolean" default="false">
+                <xs:annotation>
+                    <xs:documentation>This attribute sets for the parameter whether it is abstract or not.</xs:documentation>
+                    
+                    <xs:documentation>The current quick fix can be instantiate only from an abstract pattern that defines this abstract parameter. Inside of a global QuickFix every used parameter of an abstract pattern must be declared by an abstract parameter.</xs:documentation>
+                    <xs:documentation>If a parameter is defined as abstract, it can not have a <icode type="attribute">type</icode>, <icode type="attribute">required</icode> or <icode type="attribute">default</icode> attribute. Its value will be only form the abstract pattern instantiation.</xs:documentation>
+                    <xs:documentation source="Value">The value <icode type="attributeValue">true</icode> is used for abstract parameter, <icode type="attributeValue">false</icode> for regular parameter.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attributeGroup ref="sqf:parameterAttributes"/>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="title">
@@ -314,13 +334,14 @@
         </xs:annotation>
         <xs:complexType mixed="true">
             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:group ref="sch:foreign"/>
+                <xs:group ref="sqf:foreign"/>
                 <xs:choice>
                     <xs:element ref="sch:name"/>
                     <xs:element ref="sch:value-of"/>
                 </xs:choice>
             </xs:choice>
             <xs:attribute ref="xml:lang"/>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="p">
@@ -339,6 +360,7 @@
                 </xs:choice>
             </xs:choice>
             <xs:attribute ref="xml:lang"/>
+            <xs:attributeGroup ref="sch:foreign"/>
         </xs:complexType>
     </xs:element>
 
@@ -412,12 +434,14 @@
                 <xs:documentation source="Default">By default the anchor node is the context node of the related Schematron rule.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attributeGroup ref="sch:foreign"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="activityManipulate">
         <xs:attributeGroup ref="sqf:activityBase"/>
-        <xs:attribute name="node-type" type="sqf:nodeTypeType" default="keep">
+        <xs:attribute name="node-type" type="sqf:nodeTypeType">
             <xs:annotation>
-                <xs:documentation>The <icode type="attribute">node-type</icode> attribute defines the node type of the nodes to be added.</xs:documentation>
+                <xs:documentation>The <icode type="attribute">node-type</icode> attribute defines the node type of the nodes to be added. The attribute is required, if the target attribut is set.</xs:documentation>
+                <xs:documentation>If the <icode type="attribute">node-type</icode> value is missing, the activity element should not have a <icode type="attribute">target</icode> attribute. In this case the nodes to be added will be defined by the activity elements content.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="select" type="xs:string" use="optional">
@@ -430,7 +454,7 @@
         </xs:attribute>
         <xs:attribute name="target" type="xs:string">
             <xs:annotation>
-                <xs:documentation>This attribute defines the name of the node to be added. The attribute is required if the value of the <icode type="attribute">node-type</icode> attribute is neither <icode type="attributeValue">none</icode> nor <icode type="attributeValue">comment</icode>.</xs:documentation>
+                <xs:documentation>This attribute defines the name of the node to be added. The attribute is required if the <icode type="attribute">node-type</icode> attribute is specified and the value is not <icode type="attributeValue">comment</icode>.</xs:documentation>
                 <xs:documentation source="Value">A string to define a node name. The string can be specified by XPath expressions which are marked by curly brackets. After processing, the name must be valid to the XML Schema type xs:QName.</xs:documentation>
                 <xs:documentation>Prefixes must be attached to a namespace in the current context of the Schematron schema. Names without prefixes will be attached to the namespace declared by the <icode type="element">sqf:default-namespace</icode> element or to the null namespace.</xs:documentation>
             </xs:annotation>
@@ -462,11 +486,6 @@
     </xs:simpleType>
     <xs:simpleType name="nodeTypeType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="none">
-                <xs:annotation>
-                    <xs:documentation>The nodes to be added will be defined by the content of the activity element. If the <icode type="attribute">node-type</icode> value is <icode type="attributeValue">none</icode>, the activity element should not have a <icode type="attribute">target</icode> attribute.</xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
             <xs:enumeration value="keep">
                 <xs:annotation>
                     <xs:documentation>The node type of the node to be added will be defined by the anchor node.</xs:documentation>
@@ -513,4 +532,17 @@
             </xs:attribute>
         </xs:complexType>
     </xs:element>
+
+    <xs:group name="foreign">
+        <xs:sequence>
+            <xs:group minOccurs="0" maxOccurs="unbounded" ref="sqf:foreign-element"/>
+        </xs:sequence>
+    </xs:group>
+
+    <xs:group name="foreign-element">
+        <xs:choice>
+            <xs:any namespace="http://www.w3.org/1999/XSL/Transform" processContents="skip"/>
+            <xs:any namespace="##local" processContents="skip"/>
+        </xs:choice>
+    </xs:group>
 </xs:schema>
