@@ -163,7 +163,7 @@
                     <xs:documentation xml:lang="de">Gibt den Namen des Parameters an, wie er im Schematron QuickFix Schema verwendet wurde.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="as" type="xs:string">
+            <xs:attribute name="type" type="xs:string">
                 <xs:annotation>
                     <xs:documentation>Indicates the determined type of the parameter. The value passed on must correspond to this type.</xs:documentation>
                     <xs:documentation xml:lang="de">Gibt den festgelegten Typen des Parameters an. Der übergebene Wert muss diesem Type entsprechen.</xs:documentation>
@@ -185,6 +185,12 @@
                 <xs:annotation>
                     <xs:documentation>Indicates an ID for the parameter. This ID is used as local name for the passing on of the parameter when calling the manipulator. The namespace of the parameter is the SQF namespace. Since the ID is unique within the SVRL report, parameter dublicates are prevented.</xs:documentation>
                     <xs:documentation xml:lang="de">Gibt eine ID für den Parameter an. Diese ID wird als local name zur Parameterübergabe beim Aufruf des Manipulators verwendet. Der Namespace des Parameters ist dabei der SQF-Namespace. Da die ID innerhalb des SVRL-Reports eindeutig ist, werden so Parameter-Doubletten verhindert.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="default" type="xs:string" use="optional">
+                <xs:annotation>
+                    <xs:documentation>This attribute defines a default value for a parameter or User Entry by using a XPath expression. If the attribute is set to a <icode type="element">sqf:param</icode> element, the element must be empty.</xs:documentation>
+                    <xs:documentation source="Value">Must be a valid XPath expression.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>
