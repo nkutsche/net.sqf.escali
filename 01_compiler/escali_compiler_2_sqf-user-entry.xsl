@@ -49,15 +49,15 @@
     
     <xsl:key name="globalFixById" match="sqf:fixes/sqf:fix" use="@id"/>
     
-    <!--  
+<!--    <!-\-  
     marks as an user-entry-parameter
-    -->
+    -\->
     <xsl:template match="sqf:fix/sqf:param[@name=parent::sqf:fix/sqf:user-entry/@ref]" mode="#all">
         <xsl:copy>
             <xsl:attribute name="user-entry">yes</xsl:attribute>
             <xsl:apply-templates select="node() | @*" mode="#current"/>
         </xsl:copy>
-    </xsl:template>
+    </xsl:template>-->
     
     <xsl:template match="sch:assert[@sqf:fix] |sch:report[@sqf:fix]" mode="#all" priority="1000">
         <xsl:variable name="local-fix" select="../sqf:fix"/>
