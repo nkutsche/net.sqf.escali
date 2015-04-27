@@ -73,34 +73,53 @@
     <!--
 	sqf:call-fix
 -->
-    <xsl:template match="sqf:call-fix">
+    <xsl:template match="sqf:fix[sqf:call-fix]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="sqf:call-fix" mode="parameter"/>
+            <xsl:apply-templates select="node()" mode="callFix"/>
+        </xsl:copy>
+    </xsl:template>
+    
+    <xsl:template match="sqf:call-fix" mode="callFix">
         <xsl:variable name="idref" select="@ref"/>
-        <xsl:apply-templates select="ancestor::*/sqf:fix[@id=$idref]" mode="callFix">
+        <xsl:variable name="calledFix" select="ancestor::*/sqf:fix[@id=$idref]"/>
+        <xsl:apply-templates select="$calledFix/node() except ($calledFix/sqf:param, $calledFix/sqf:description)"/>
+    </xsl:template>
+    
+    <xsl:template match="sqf:call-fix" mode="parameter">
+        <xsl:variable name="idref" select="@ref"/>
+        <xsl:variable name="calledFix" select="ancestor::*/sqf:fix[@id=$idref]"/>
+        <xsl:apply-templates select="$calledFix/sqf:param" mode="#current">
             <xsl:with-param name="params" select="sqf:with-param" tunnel="yes"/>
         </xsl:apply-templates>
     </xsl:template>
-    <xsl:template match="sqf:fix/sqf:param" priority="100" mode="#all">
-        <xsl:param name="params" select="()" tunnel="yes"/>
-        <xsl:variable name="overlayedParam" select="$params[@name=current()/@name]"/>
+    
+    <xsl:template match="sqf:fix/sqf:param" mode="parameter">
+        <xsl:param name="params" select="()" tunnel="yes" as="element(sqf:with-param)*"/>
+        <xsl:variable name="overlayedParam" select="$params[@name=current()/@name]" as="element(sqf:with-param)?"/>
         <xsl:copy>
-            <xsl:apply-templates select="@name | @user-entry | @required"/>
+            <xsl:apply-templates select="@name | @required"/>
             <xsl:if test="$es:type-available != 'false'">
-                <xsl:apply-templates select="@as"/>
+                <xsl:apply-templates select="@type"/>
             </xsl:if>
             <xsl:choose>
                 <xsl:when test="normalize-space($overlayedParam)!='' or $overlayedParam/@select">
                     <xsl:apply-templates select="$overlayedParam/@select | $overlayedParam/node()"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:copy-of select="@select"/>
+                    <xsl:copy-of select="@default"/>
                     <xsl:apply-templates/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:copy>
     </xsl:template>
+        
     
-    <xsl:template match="sqf:fix" mode="callFix" priority="100">
-        <xsl:apply-templates select="node()" mode="#current"/>
+    
+    
+    <xsl:template match="sqf:with-param/@select">
+        <xsl:attribute name="default" select="."/>
     </xsl:template>
-    <xsl:template match="sqf:description" mode="callFix" priority="100"/>
+    
 </xsl:stylesheet>
