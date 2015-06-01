@@ -8,6 +8,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sqf.stringUtils"/>
 	<classpathentry kind="lib" path="/net.sqf.xmlUtils/lib/woodstox-core-lgpl-4.2.0.jar" sourcepath="/woodstox-4.2.0/src/java"/>
 	<classpathentry kind="lib" path="lib/joda-time-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/saxon9he.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.saxonica.com/documentation9.5/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sqf.xsm"/>
 	<classpathentry kind="src" path="/net.sqf.utils.process"/>
 	<classpathentry kind="output" path="bin"/>

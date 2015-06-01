@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.xml.sax.SAXException;
@@ -16,6 +18,7 @@ import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 import net.sqf.xmlUtils.xslt.Parameter;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
@@ -23,16 +26,16 @@ import net.sqf.xsm.operations.PositionalReplace;
 
 public class Executor {
 	
-	private XSLTPipe resolver = new XSLTPipe("");
+	private XSLTPipe extractor = new XSLTPipe("");
 	
-	public Executor(EscaliRsourcesInterface resource) throws TransformerConfigurationException, FileNotFoundException{
-		resolver.addStep(resource.getResolver());
+	public Executor(EscaliRsourcesInterface resource) throws XSLTErrorListener, FileNotFoundException{
+		extractor.addStep(resource.getResolver());
 	}
 
-	public TextSource execute(_QuickFix[] fixes, SVRLReport report, Config config) throws TransformerConfigurationException{
-		return execute(fixes, report.getInput(), report.getSVRL(), config);
-	}
-	public TextSource execute(_QuickFix[] fixes, TextSource input, TextSource svrl, Config config) throws TransformerConfigurationException{
+//	public TextSource execute(_QuickFix[] fixes, SVRLReport report, Config config) throws XSLTErrorListener{
+//		return execute(fixes, report.getInput(), report.getSVRL(), config);
+//	}
+	public TextSource execute(_QuickFix[] fixes, TextSource input, TextSource svrl, Config config) throws XSLTErrorListener{
 		String[] ids = new String[fixes.length];
 		ArrayList<Parameter> ueParams = new ArrayList<Parameter>();
 		for (int i = 0; i < ids.length; i++) {
@@ -42,17 +45,17 @@ public class Executor {
 				ueParams.add(new Parameter(entry.getId(), ProcessNamespaces.SQF_NS, entry.getValue()));
 			}
 		}
-		
-		XSLTPipe manipulator = new XSLTPipe("");
+		final ArrayList<TransformerException> exceptions = new ArrayList<TransformerException>();
+		XSLTPipe manipulator = new XSLTPipe("", new XSLTErrorListener());
 		ArrayList<Parameter> params = new ArrayList<Parameter>();
 		params.add(new Parameter("id", ids));
-		TextSource resolverXSL = resolver.pipe(svrl, params); 
-		manipulator.addStep(resolverXSL, ueParams);
-		TextSource resolverResult = manipulator.pipe(input, config.createManipulatorParams());
+		TextSource extractorXSL = extractor.pipe(svrl, params); 
+		manipulator.addStep(extractorXSL, ueParams);
+		TextSource extractorResult = manipulator.pipe(input, config.createManipulatorParams());
 		
 		if(config.isXmlSaveMode()){
 			try {
-				PositionalReplace pr = new PositionalReplace(resolverResult, input);
+				PositionalReplace pr = new PositionalReplace(extractorResult, input);
 				return pr.getSource();
 			} catch (IOException e) {
 				return input;
@@ -66,8 +69,8 @@ public class Executor {
 				return input;
 			}
 		} else {
-			return resolverResult;
+			return extractorResult;
 		}
-//		return resolverXSL;
+//		return extractorXSL;
 	}
 }

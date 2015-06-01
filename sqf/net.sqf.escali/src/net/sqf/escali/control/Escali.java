@@ -19,6 +19,7 @@ import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;
 import net.sqf.utils.process.log.ProcessLoger;
 import net.sqf.xmlUtils.exceptions.ValidationSummaryException;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 import net.sqf.xmlUtils.xslt.Parameter;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
 
@@ -38,21 +39,21 @@ public class Escali {
 	
 	private SchematronBaseValidator baseVal = null;
 	
-	public Escali() throws TransformerConfigurationException, FileNotFoundException{
+	public Escali() throws XSLTErrorListener, FileNotFoundException{
 		this(new EscaliArchiveResources());
 	}
 	
-	public Escali(EscaliRsourcesInterface resource) throws TransformerConfigurationException, FileNotFoundException{
+	public Escali(EscaliRsourcesInterface resource) throws XSLTErrorListener, FileNotFoundException{
 		this(ConfigFactory.createConfig(resource.getConfig()), resource);
 		
 		
 	}
 	
-	public Escali(Config config, EscaliRsourcesInterface resource) throws TransformerConfigurationException, FileNotFoundException {
+	public Escali(Config config, EscaliRsourcesInterface resource) throws XSLTErrorListener, FileNotFoundException {
 		this(config, resource, true);
 	}
 	
-	protected Escali(Config config, EscaliRsourcesInterface resource, boolean needsBaseValidation) throws TransformerConfigurationException, FileNotFoundException {
+	protected Escali(Config config, EscaliRsourcesInterface resource, boolean needsBaseValidation) throws XSLTErrorListener, FileNotFoundException {
 		this.config = config;
 		this.resource = resource;
 
@@ -86,10 +87,10 @@ public class Escali {
 //	}
 //	
 
-	public SchemaInfo getSchemaInfo(TextSource schema) throws TransformerConfigurationException, XPathExpressionException, IOException, SAXException, XMLStreamException{
+	public SchemaInfo getSchemaInfo(TextSource schema) throws XSLTErrorListener, XPathExpressionException, IOException, SAXException, XMLStreamException{
 		return new SchemaInfo(schema, this.resource);
 	}
-	public void compileSchema(TextSource schema, Config config, ProcessLoger loger) throws TransformerConfigurationException, FileNotFoundException, CancelException{
+	public void compileSchema(TextSource schema, Config config, ProcessLoger loger) throws XSLTErrorListener, FileNotFoundException, CancelException{
 		this.config = config;
 		
 		if(this.baseVal != null){
@@ -107,44 +108,44 @@ public class Escali {
 	public void compileSchema(TextSource schema, ProcessLoger loger) throws CancelException {
 		try {
 			this.compileSchema(schema, this.config, loger);
-		} catch (TransformerConfigurationException e) {
+		} catch (XSLTErrorListener e) {
 			loger.log(e, true);
 		} catch (FileNotFoundException e) {
 			loger.log(e, true);
 		}
 	}
 	
-	public SVRLReport validate(TextSource input, ArrayList<Parameter> params) throws TransformerException, XPathExpressionException, IOException, SAXException, URISyntaxException, XMLStreamException{
-		val.validateInstance(input, params);
+	public SVRLReport validate(TextSource input, ArrayList<Parameter> params, ProcessLoger logger) throws XSLTErrorListener, XPathExpressionException, IOException, SAXException, URISyntaxException, XMLStreamException{
+		val.validateInstance(input, params, logger);
 		this.report = new SVRLReport(val.getSvrl(), input, this.val.getSchema(), this.resource);
 		return this.report;
 	}
 	
-	public SVRLReport validate(TextSource input) throws TransformerException, XPathExpressionException, IOException, SAXException, URISyntaxException, XMLStreamException{
-		return validate(input, new ArrayList<Parameter>());
+	public SVRLReport validate(TextSource input, ProcessLoger logger) throws XSLTErrorListener, XPathExpressionException, IOException, SAXException, URISyntaxException, XMLStreamException{
+		return validate(input, new ArrayList<Parameter>(), logger);
 	}
 	
-	public TextSource validateHTML() throws TransformerConfigurationException{
-		return this.report.getFormatetReport(SVRLReport.HTML_FORMAT);
-	}
+//	public TextSource validateHTML() throws TransformerConfigurationException{
+//		return this.report.getFormatetReport(SVRLReport.HTML_FORMAT);
+//	}
+//	
+//	public TextSource validateText() {
+//		return this.report.getFormatetReport(SVRLReport.TEXT_FORMAT);
+//	}
 	
-	public TextSource validateText() throws TransformerConfigurationException{
-		return this.report.getFormatetReport(SVRLReport.TEXT_FORMAT);
-	}
-	
-	public TextSource executeFix(_QuickFix[] fixIds, TextSource svrlSource, TextSource input) throws TransformerConfigurationException{
+	public TextSource executeFix(_QuickFix[] fixIds, TextSource svrlSource, TextSource input) throws XSLTErrorListener {
 		return this.exec.execute(fixIds, input, svrlSource, this.config);
 	}
 
-	public TextSource executeFix(_QuickFix[] fixIds, SVRLReport report, TextSource input) throws TransformerConfigurationException{
+	public TextSource executeFix(_QuickFix[] fixIds, SVRLReport report, TextSource input) throws XSLTErrorListener {
 		return executeFix(fixIds, report.getSVRL(), input);
 	}
-	public TextSource executeFix(_QuickFix[] fixIds, SVRLReport report) throws TransformerConfigurationException{
-		return this.exec.execute(fixIds, report, this.config);
-	}
+//	public TextSource executeFix(_QuickFix[] fixIds, SVRLReport report) throws XSLTErrorListener {
+//		return this.exec.execute(fixIds, report, this.config);
+//	}
 	
-	public TextSource executeFix(_QuickFix[] fixIds) throws TransformerConfigurationException{
-		return this.executeFix(fixIds, this.report);
+	public TextSource executeFix(_QuickFix[] fixIds, TextSource source) throws XSLTErrorListener {
+		return this.executeFix(fixIds, this.report, source);
 	}
 	
 	public SVRLReport getReport(){

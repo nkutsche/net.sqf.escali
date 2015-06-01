@@ -27,7 +27,9 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 	private _QuickFix defaultFix;
 	private _Flag flag;
 	private _Report report;
-	private final StringNode instance;
+	// private final StringNode instance;
+	private final NodeInfo locationInfo;
+	private final File instanceFile;
 
 	public static ArrayList<_SVRLMessage> getSubsequence(
 			ArrayList<_ModelNode> nodes) {
@@ -43,13 +45,15 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 		return subsequence;
 	}
 
-	SVRLMessage(Node messageNode, _Report report, int svrlIdx, int Index, StringNode instance) throws DOMException, URISyntaxException,
+	SVRLMessage(Node messageNode, _Report report, int svrlIdx, int Index,
+			StringNode instance) throws DOMException, URISyntaxException,
 			XPathExpressionException {
 		super(messageNode, svrlIdx);
-		this.instance = instance;
+		this.instanceFile = instance.getFile();
 		this.setId(SVRLReport.XPR.getAttributValue(messageNode, "id"));
 		this.setIndex(Index);
 		this.report = report;
+
 
 		// S E T N A M E
 		XPathReader xpathreader = new XPathReader();
@@ -62,51 +66,55 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 		}
 		this.setName(message);
 
-		// L I N E N U M B E R
-		this.location = SVRLReport.XPR.getAttributValue(messageNode, "location");
+		// L O C A T I O N
+		this.location = SVRLReport.XPR
+				.getAttributValue(messageNode, "location");
+		this.locationInfo = instance.getNodeInfo(this.location);
 
 		// E R R O R L E V E L (@role)
 		String levelValue = SVRLReport.XPR
 				.getAttributValue(messageNode, "role");
-		this.errorLevel = levelValue.equals("") ? _SVRLMessage.LEVEL_DEFAULT : Double.parseDouble(levelValue);
-		
+		this.errorLevel = levelValue.equals("") ? _SVRLMessage.LEVEL_DEFAULT
+				: Double.parseDouble(levelValue);
+
 		// D I A G N O S T I C S
-		NodeList diagnNodes = xpathreader.getNodeSet(
-				"es:diagnostics", messageNode);
+		NodeList diagnNodes = xpathreader.getNodeSet("es:diagnostics",
+				messageNode);
 
 		for (int i = 0; i < diagnNodes.getLength(); i++) {
-			this.addChild(ModelNodeFac.nodeFac.getNode(diagnNodes.item(i), instance));
+			this.addChild(ModelNodeFac.nodeFac.getNode(diagnNodes.item(i),
+					instance));
 		}
 
 		// Q U I C K F I X E S
 		NodeList fixNodes = xpathreader.getNodeSet("sqf:fix", messageNode);
-		Node defFixNode = xpathreader.getNode("sqf:fix[@default='true']", messageNode);
+		Node defFixNode = xpathreader.getNode("sqf:fix[@default='true']",
+				messageNode);
 
 		for (int i = 0; i < fixNodes.getLength(); i++) {
 			Node fixNode = fixNodes.item(i);
-			_QuickFix fix = (_QuickFix) ModelNodeFac.nodeFac.getNode(fixNode, instance);
+			_QuickFix fix = (_QuickFix) ModelNodeFac.nodeFac.getNode(fixNode,
+					instance);
 			this.addChild(fix);
-			
-			if(defFixNode == fixNode){
+
+			if (defFixNode == fixNode) {
 				this.defaultFix = fix;
 			}
 		}
 
 		// F L A G S
 		Node flagNode = messageNode.getAttributes().getNamedItem("flag");
-		if (flagNode != null){
+		if (flagNode != null) {
 			this.flag = ModelNodeFac.nodeFac.getFlag(flagNode);
 			flag.addChild(this);
 		}
-		
-		
+
 		this.setName(this.getName());
 	}
 
-
 	@Override
 	public void addChild(_ModelNode child) {
-		if (child instanceof _Flag){
+		if (child instanceof _Flag) {
 			this.flag = (_Flag) child;
 		} else {
 			super.addChild(child);
@@ -115,9 +123,9 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 			}
 		}
 	}
-	
+
 	@Override
-	public boolean hasQuickFixes(){
+	public boolean hasQuickFixes() {
 		return getQuickFixes().length > 0;
 	}
 
@@ -127,14 +135,13 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 		ArrayList<_QuickFix> fixes = QuickFix.getSubsequence(children);
 		return fixes.toArray(new _QuickFix[fixes.size()]);
 	}
-	
+
 	@Override
 	public _QuickFix getQuickFix(String fixId) {
-		ArrayList<_QuickFix> fixList = QuickFix.getSubsequence(this.getChildById(new String[]{fixId}));
+		ArrayList<_QuickFix> fixList = QuickFix.getSubsequence(this
+				.getChildById(new String[] { fixId }));
 		return fixList.get(0);
 	}
-
-
 
 	@Override
 	public String getPatternId() {
@@ -152,7 +159,7 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 	public _QuickFix getDefaultFix() {
 		return this.defaultFix;
 	}
-	
+
 	@Override
 	public boolean hasDefaultFix() {
 		return this.defaultFix != null;
@@ -162,28 +169,26 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 	public String getLocation() {
 		return this.location;
 	}
-	
+
 	@Override
-	public NodeInfo getLocationInIstance() throws XPathExpressionException{
-		return this.instance.getNodeInfo(this.getLocation());
+	public NodeInfo getLocationInIstance() {
+		return this.locationInfo;
 	}
 
 	@Override
-	public File getInstanceFile(){
-		return this.instance.getFile();
+	public File getInstanceFile() {
+		return this.instanceFile;
 	}
-
 
 	@Override
 	public double getErrorLevel() {
 		return doubleToLevel(this.errorLevel);
 	}
-	
+
 	@Override
 	public int getErrorLevelInt() {
 		return doubleToLevel(this.errorLevel);
 	}
-	
 
 	@Override
 	public double getErrorWeight() {
@@ -201,37 +206,34 @@ public class SVRLMessage extends ModelNode implements _SVRLMessage {
 		ArrayList<Diagnostic> diagn = Diagnostic.getSubsequence(children);
 		return diagn;
 	}
-	
+
 	static public int doubleToLevel(double value) {
 		int levelCount = _SVRLMessage.LEVEL_COUNT;
 		value = value * levelCount;
 		value = Math.floor(value);
 		return (int) value;
 	}
+
 	public static String levelToString(int i) {
 		return _SVRLMessage.LEVEL_NAMES[i];
 	}
-	public static String levelToString(int[] levels){
-		
+
+	public static String levelToString(int[] levels) {
+
 		String summary = "";
-		for (int i = levels.length - 1; i >= 0 ; i--) {
+		for (int i = levels.length - 1; i >= 0; i--) {
 			if (levels[i] > 0) {
 				summary += levels[i] + " " + levelToString(i);
 				summary += levels[i] > 1 ? "s" : "";
-				summary += i  > 0 ? ", " : "";
+				summary += i > 0 ? ", " : "";
 			}
 		}
 		return summary;
 	}
 
-
-	
 	@Override
 	public String toString() {
-		try {
-			return this.getLocationInIstance().getStart().getLineNumber() + ": " + this.getName();
-		} catch (XPathExpressionException e) {
-			return this.getName();
-		}
+		return this.getLocationInIstance().getStart().getLineNumber() + ": "
+				+ this.getName();
 	}
 }

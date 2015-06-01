@@ -25,6 +25,7 @@ import net.sqf.utils.process.exceptions.CancelException;
 import net.sqf.utils.process.log.DefaultProcessLoger;
 import net.sqf.xmlUtils.exceptions.ValidationException;
 import net.sqf.xmlUtils.exceptions.ValidationSummaryException;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 import net.sqf.xmlUtils.staxParser.StringNode;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 import net.sqf.xmlUtils.xsd.Xerces;
@@ -37,7 +38,7 @@ public class SchematronBaseValidator {
 
 	public SchematronBaseValidator(EscaliRsourcesInterface resource,
 			Config config) throws SAXNotRecognizedException,
-			SAXNotSupportedException, TransformerConfigurationException,
+			SAXNotSupportedException, XSLTErrorListener,
 			IOException, CancelException {
 		this.resource = resource;
 		xerces = new Xerces(ProcessNamespaces.SCH_NS,
@@ -60,7 +61,7 @@ public class SchematronBaseValidator {
 		}
 		_Report report;
 		try {
-			report = internEscali.validate(schema).getReport();
+			report = internEscali.validate(schema, new DefaultProcessLoger()).getReport();
 			double mel = report.getMaxErrorLevel();
 			if(mel >= _SVRLMessage.LEVEL_ERROR){
 				ArrayList<_SVRLMessage> errors = report.getMessages(_SVRLMessage.LEVEL_ERROR, _SVRLMessage.LEVEL_FATAL_ERROR);

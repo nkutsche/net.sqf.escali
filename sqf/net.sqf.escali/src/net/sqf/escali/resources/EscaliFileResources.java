@@ -13,7 +13,7 @@ public class EscaliFileResources implements EscaliRsourcesInterface {
 	private final File baseFolder;
 	private final File escaliFolder;
 	private final File valFolder;
-	private final File resolverFolder;
+	private final File extractorFolder;
 	
 	public File defaultTempFolder;
 	
@@ -36,7 +36,7 @@ public class EscaliFileResources implements EscaliRsourcesInterface {
 		this.escaliFolder = new File(baseFolder, "xml/xsl");
 		this.defaultTempFolder = new File(baseFolder, "../temp");
 		this.valFolder = new File(escaliFolder, "02_validator");
-		this.resolverFolder = new File(escaliFolder, "03_resolver");
+		this.extractorFolder = new File(escaliFolder, "03_extractor");
 	}
 	
 	public Source getConfig() throws FileNotFoundException{
@@ -82,13 +82,13 @@ public class EscaliFileResources implements EscaliRsourcesInterface {
 //	
 	
 	public Source getResolver() throws FileNotFoundException{
-		return getInputStream(resolverFolder, "escali_resolver_1_main.xsl");
+		return getInputStream(extractorFolder, "escali_extractor_1_main.xsl");
 	}
 
 	@Override
 	public Source getSchematronSchema() throws FileNotFoundException {
 		File folder = new File(baseFolder, "xml/schema/SQF");
-		return getInputStream(folder, "schematron-schema.xsd");
+		return getInputStream(folder, "iso-schematron.xsd");
 	}
 
 	@Override

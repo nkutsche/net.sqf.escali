@@ -9,6 +9,7 @@ import net.sqf.escali.control.SVRLReport;
 import net.sqf.escali.control.report._ModelNode;
 import net.sqf.escali.control.report._QuickFix;
 import net.sqf.escali.control.report._Report;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 
 public class Fixing {
 
@@ -19,15 +20,15 @@ public class Fixing {
 		this.report = report;
 	}
 	
-	public void executeFix(String fixId) throws TransformerConfigurationException, IOException {
-		_Report reportObj = this.report.getReport();
-		_ModelNode node = reportObj.getChildById(fixId);
-		_QuickFix[] fixes;
-		if(node != null && node instanceof _QuickFix){
-			fixes = new _QuickFix[]{(_QuickFix) node};
-		} else {
-			fixes = new _QuickFix[]{};
-		}
-		escali.executeFix(fixes, this.report, this.report.getInput());
+	public void executeFix(String fixId) throws XSLTErrorListener, IOException {
+//		_Report reportObj = this.report.getReport();
+//		_ModelNode node = reportObj.getChildById(fixId);
+//		_QuickFix[] fixes;
+//		if(node != null && node instanceof _QuickFix){
+//			fixes = new _QuickFix[]{(_QuickFix) node};
+//		} else {
+//			fixes = new _QuickFix[]{};
+//		}
+//		escali.executeFix(fixes, this.report, this.report.getInput());
 	}
 }
