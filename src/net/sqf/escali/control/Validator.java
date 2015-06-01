@@ -8,10 +8,12 @@ import javax.xml.transform.TransformerConfigurationException;
 
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
+import net.sqf.utils.process.log.DefaultProcessLoger;
 import net.sqf.utils.process.log.ProcessLoger;
 import net.sqf.utils.process.log.ProcessStateListener;
 import net.sqf.utils.process.queues._Task;
 import net.sqf.utils.process.queues.listeners.QueueListener;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 import net.sqf.xmlUtils.xslt.Parameter;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
 
@@ -49,7 +51,7 @@ public class Validator {
 		}
 	};
 	
-	public Validator(EscaliRsourcesInterface resource) throws TransformerConfigurationException, FileNotFoundException{
+	public Validator(EscaliRsourcesInterface resource) throws XSLTErrorListener, FileNotFoundException{
 		this.resource = resource;
 		compilerPipe = new XSLTPipe("Escali compiling");
 		Source[] compiler = resource.getCompiler();
@@ -61,12 +63,12 @@ public class Validator {
 		precompilerPipe.addStep(precompiler);
 	}
 	
-	protected TextSource preCompileSchema(TextSource schema, Config config, ProcessLoger loger) throws TransformerConfigurationException, FileNotFoundException {
+	protected TextSource preCompileSchema(TextSource schema, Config config, ProcessLoger loger) {
 		loger.log("Create validator");
-		return precompilerPipe.pipe(schema, config.createCompilerParams());
+		return precompilerPipe.pipe(schema, config.createCompilerParams(), new DefaultProcessLoger());
 	}
 
-	protected void compileSchema(TextSource schema, Config config, ProcessLoger loger) throws TransformerConfigurationException, FileNotFoundException {
+	protected void compileSchema(TextSource schema, Config config, ProcessLoger loger) throws XSLTErrorListener, FileNotFoundException {
 		this.schema = schema;
 		loger.log("Create validator");
 		TextSource validator = compilerPipe.pipe(schema, config.createCompilerParams());
@@ -75,7 +77,7 @@ public class Validator {
 		
 	}
 	
-	private void createValidatorPipe(TextSource validator1) throws TransformerConfigurationException, FileNotFoundException{
+	private void createValidatorPipe(TextSource validator1) throws XSLTErrorListener, FileNotFoundException{
 		this.validatorPipe = new XSLTPipe("Escali validate");
 		validatorPipe.addStep(validator1);
 		validatorPipe.addStep(resource.getValidator());
@@ -84,8 +86,8 @@ public class Validator {
 	}
 	
 	
-	protected void validateInstance(TextSource xml, ArrayList<Parameter> params){
-		this.svrl = validatorPipe.pipe(xml, params);
+	protected void validateInstance(TextSource xml, ArrayList<Parameter> params, ProcessLoger logger){
+		this.svrl = validatorPipe.pipe(xml, params, logger);
 	}
 	
 	

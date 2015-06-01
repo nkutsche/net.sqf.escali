@@ -12,6 +12,7 @@ import org.xml.sax.SAXException;
 import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 import net.sqf.xmlUtils.staxParser.StringNode;
 import net.sqf.xmlUtils.xpath.XPathReader;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
@@ -27,7 +28,7 @@ public class SchemaInfo {
 	private String defaultLang;
 	private final TextSource schema;
 	
-	protected SchemaInfo(TextSource source, EscaliRsourcesInterface resource) throws TransformerConfigurationException, IOException, SAXException, XMLStreamException, XPathExpressionException{
+	protected SchemaInfo(TextSource source, EscaliRsourcesInterface resource) throws XSLTErrorListener, IOException, SAXException, XMLStreamException, XPathExpressionException{
 		this.schema = source;
 		infoGenerator.addStep(resource.getSchemaInfo());
 		StringNode schemaInfoDoc = new StringNode(infoGenerator.pipe(source));

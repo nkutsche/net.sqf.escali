@@ -37,7 +37,7 @@ public class UserEntry extends MessageGroup implements _UserEntry {
 	private boolean useDefault;
 	private final TypeConverter converter;
 	
-	private boolean isValueValid = true;
+	private boolean isValueValid = false;
 	
 
 	UserEntry(Node node, int svrlIdx, int index) throws DOMException,
@@ -47,13 +47,8 @@ public class UserEntry extends MessageGroup implements _UserEntry {
 		XPathReader xpathreader = new XPathReader();
 		Node param = xpathreader.getNode("sqf:param", node);
 		this.setId(SVRLReport.XPR.getAttributValue(param, "param-id"));
-		this.dataType = SVRLReport.XPR.getAttributValue(param, "as", "",
+		this.dataType = SVRLReport.XPR.getAttributValue(param, "type", "",
 				"xs:string");
-		
-		String required = SVRLReport.XPR.getAttributValue(param, "required", "", "no");
-		if(required.equals("yes")){
-			isValueValid = false;
-		}
 		
 		this.converter = new TypeConverter(this.dataType);
 		

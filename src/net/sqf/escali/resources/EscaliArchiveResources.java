@@ -11,7 +11,7 @@ import javax.xml.transform.stream.StreamSource;
 public class EscaliArchiveResources implements EscaliRsourcesInterface {
 	private final String escaliFolder;
 	private final String valFolder;
-	private final String resolverFolder;
+	private final String extractorFolder;
 	private final String path;
 	
 	private Source getInputStream(String dir, String path) throws FileNotFoundException{
@@ -36,7 +36,7 @@ public class EscaliArchiveResources implements EscaliRsourcesInterface {
 		this.path = path;
 		this.escaliFolder = path + "xsl/";
 		this.valFolder = escaliFolder + "02_validator/";
-		this.resolverFolder = escaliFolder +  "03_resolver/";
+		this.extractorFolder = escaliFolder +  "03_extractor/";
 	}
 	public EscaliArchiveResources(){
 		this("/");
@@ -85,12 +85,12 @@ public class EscaliArchiveResources implements EscaliRsourcesInterface {
 //	
 	
 	public Source getResolver() throws FileNotFoundException{
-		return getInputStream(resolverFolder, "escali_resolver_1_main.xsl");
+		return getInputStream(extractorFolder, "escali_extractor_1_main.xsl");
 	}
 
 	@Override
 	public Source getSchematronSchema() throws FileNotFoundException {
-		return getInputStream(this.path + "schema/SQF/", "schematron-schema.xsd");
+		return getInputStream(this.path + "schema/SQF/", "iso-schematron.xsd");
 	}
 	
 	@Override

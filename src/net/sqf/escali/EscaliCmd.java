@@ -21,6 +21,7 @@ import net.sqf.escali.resources.EscaliOptions;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;
 import net.sqf.utils.process.log.DefaultProcessLoger;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -55,7 +56,7 @@ public class EscaliCmd {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (TransformerException e) {
+		} catch (XSLTErrorListener e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -69,13 +70,13 @@ public class EscaliCmd {
 		}
 	}
 
-	private void process() throws XPathExpressionException, IOException, TransformerException, SAXException, URISyntaxException, XMLStreamException, CancelException {
+	private void process() throws XPathExpressionException, IOException, XSLTErrorListener, SAXException, URISyntaxException, XMLStreamException, CancelException {
 		if (EscaliOptions.hasOption(cmd, EscaliOptions.VALIDATE_OPTION)) {
 			validateProcess();
 		}
 	}
 	
-	private void validateProcess() throws IOException, XPathExpressionException, TransformerException, SAXException, URISyntaxException, XMLStreamException, CancelException{
+	private void validateProcess() throws IOException, XPathExpressionException, XSLTErrorListener, SAXException, URISyntaxException, XMLStreamException, CancelException{
 		String[] vValues = EscaliOptions.getOptionValues(cmd, EscaliOptions.VALIDATE_OPTION);
 		File schema = new File(vValues[1]);
 		File instance = new File(vValues[0]); 

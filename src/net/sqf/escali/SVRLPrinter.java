@@ -23,7 +23,6 @@ public class SVRLPrinter {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return "SVRL report:\n" + this.svrl.getTextSource().toString();
 	}
 }

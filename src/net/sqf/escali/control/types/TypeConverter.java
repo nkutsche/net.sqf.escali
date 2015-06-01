@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 import org.joda.time.DateTime;
 
+import net.sf.saxon.type.ValidationException;
+import net.sf.saxon.value.*;
+
 public class TypeConverter {
 	private String type;
 	private Class objectClass = String.class;
@@ -18,6 +21,8 @@ public class TypeConverter {
 			result = null;
 		} else if (type.equals("xs:dateTime")) {
 			result = getClass(type).cast(getDate(value));
+		} else if (type.equals("xs:time")) {
+			result = getClass(type).cast(getTime(value));
 		} else if (type.equals("xs:date")) {
 			result = getClass(type).cast(getDate(value));
 		} else if (type.equals("xs:integer")) {
@@ -37,8 +42,16 @@ public class TypeConverter {
 		}
 	}
 	
-	private static DateTime getDate(String value){
-		return new DateTime();
+	private static Object getTime(String value){
+		return TimeValue.makeTimeValue(value);
+	}
+	
+	private static DateValue getDate(String value){
+		try {
+			return new DateValue(value);
+		} catch (ValidationException e) {
+			return null;
+		}
 	}
 
 	private static HashMap<String, Class> typeVerifierMap = new HashMap<String, Class>();
@@ -53,6 +66,13 @@ public class TypeConverter {
 		typeVerifierMap.put("xs:unsignedInt", Double.class);
 		typeVerifierMap.put("xs:unsignedShort", Double.class);
 		typeVerifierMap.put("sqf:color", String.class);
-		typeVerifierMap.put("xs:date", DateTime.class);
+		typeVerifierMap.put("xs:date", DateValue.class);
+	}
+	public String convertToString(Object value) {
+			if (value instanceof DateValue) {
+				DateValue dv = (DateValue) value; 
+				return dv.getPrimitiveStringValue().toString(); 
+			}
+		return value.toString();
 	}
 }

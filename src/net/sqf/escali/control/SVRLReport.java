@@ -1,34 +1,30 @@
 package net.sqf.escali.control;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.ctc.wstx.io.WstxInputLocation;
-import com.sun.org.apache.xpath.internal.NodeSet;
-
 import net.sqf.escali.control.report.ModelNodeFac;
-import net.sqf.escali.control.report.Report;
 import net.sqf.escali.control.report.SVRLMessage;
 import net.sqf.escali.control.report._Report;
 import net.sqf.escali.control.report._SVRLMessage;
-import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
-import net.sqf.xmlUtils.staxParser.PositionalXMLReader;
+import net.sqf.utils.process.log.DefaultProcessLoger;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
+import net.sqf.xmlUtils.staxParser.NodeInfo;
 import net.sqf.xmlUtils.staxParser.StringNode;
 import net.sqf.xmlUtils.xpath.XPathReader;
 import net.sqf.xmlUtils.xslt.Parameter;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
+
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
 
 public class SVRLReport {
 	public static String HTML_FORMAT = "html";
@@ -40,72 +36,66 @@ public class SVRLReport {
 
 	private XSLTPipe htmlPrinter = new XSLTPipe("Escali HTML output");
 	private XSLTPipe textPrinter = new XSLTPipe("Escali text output");
+	private XSLTPipe escaliPrinter = new XSLTPipe("Escali SVRL output");
 	
 	private final StringNode svrl;
 	
-	private NodeList messages;
-	private NodeList quickFixes;
 	
-	private StringNode input;
-	private TextSource schema;
+	private File sourceFile;
 	
 	private _Report report;
 
-	private StringNode escaliReport;
 	
-	public SVRLReport(TextSource svrl, TextSource input, TextSource schema, EscaliRsourcesInterface resource) throws TransformerConfigurationException, IOException, SAXException, XMLStreamException, XPathExpressionException, DOMException, URISyntaxException{
-		XSLTPipe escaliReporter = new XSLTPipe("Escali SVRL output");
+	public SVRLReport(TextSource svrl, TextSource input, TextSource schema, EscaliRsourcesInterface resource) throws XSLTErrorListener, IOException, SAXException, XMLStreamException, XPathExpressionException, DOMException, URISyntaxException{
 		
 		htmlPrinter.addStep(resource.getSvrlPrinter("html"));
 		textPrinter.addStep(resource.getSvrlPrinter("text"));
-		escaliReporter.addStep(resource.getSvrlPrinter("escali"));
+		escaliPrinter.addStep(resource.getSvrlPrinter("escali"));
 		
-		this.input = new StringNode(input);
-		this.schema = schema;
+		StringNode source = new StringNode(input);
 		
+		this.sourceFile = input.getFile();
 		this.svrl = new StringNode(svrl);
 		
 		ArrayList<Parameter> params = new ArrayList<Parameter>();
 		params.add(new Parameter("schema", schema.getFile().toURI()));
 		params.add(new Parameter("instance", input.getFile().toURI()));
-		this.escaliReport = new StringNode(escaliReporter.pipe(svrl, params));
+		StringNode escaliReport = new StringNode(escaliPrinter.pipe(svrl, params));
 		
-		this.report = ModelNodeFac.nodeFac.getReport(XPR.getNode("/es:escali-reports", escaliReport.getDocument()), this.input);
+		this.report = ModelNodeFac.nodeFac.getReport(XPR.getNode("/es:escali-reports", escaliReport.getDocument()), source);
 	}
 	
 	
 	private TextSource getReportAsHTML(){
-		return htmlPrinter.pipe(this.svrl.getTextSource());
+		return htmlPrinter.pipe(this.svrl.getTextSource(), new DefaultProcessLoger());
 	}
 	
 	private TextSource getReportAsText(){
-		return textPrinter.pipe(this.svrl.getTextSource());
+		return textPrinter.pipe(this.svrl.getTextSource(), new DefaultProcessLoger());
 	}
 	
 	private TextSource getReportEscali(){
-		return this.escaliReport.getTextSource();
+		return escaliPrinter.pipe(this.svrl.getTextSource(), new DefaultProcessLoger());
 	}
 	
 	private TextSource getReportOxygen() throws IOException, SAXException, XMLStreamException, XPathExpressionException{
-		TextSource oxygenReport = TextSource.createVirtualTextSource(this.escaliReport.getFile());
+		TextSource oxygenReport = TextSource.createVirtualTextSource(this.svrl.getFile());
 		ArrayList<_SVRLMessage> messages = this.report.getMessages();
 		for (_SVRLMessage message : messages) {
-			String report = oxygenReport.toString() + getOxygenReportEntry(message, this.input) + "\n\n";
+			String report = oxygenReport.toString() + getOxygenReportEntry(message) + "\n\n";
 			oxygenReport.setData(report);
 		}
 		return oxygenReport;
 	}
 	
-	private String getOxygenReportEntry(_SVRLMessage message, StringNode instanceSN) throws XPathExpressionException{
-		Node node = instanceSN.getNode(message.getLocation());
-		String userdatakey = node.getNodeType() == Node.ELEMENT_NODE ? PositionalXMLReader.NODE_INNER_LOCATION_START : PositionalXMLReader.NODE_LOCATION_END;
+	private String getOxygenReportEntry(_SVRLMessage message) throws XPathExpressionException{
+		NodeInfo ni = message.getLocationInIstance();
+		Location location = ni.getMarkStartLocation();
 	
-		WstxInputLocation location = (WstxInputLocation) node.getUserData(userdatakey);
-//		WstxInputLocation locationEnd = (WstxInputLocation) instanceSN.getNode(message.getLocation()).getUserData(PositionalXMLReader.NODE_LOCATION_END);
 		String entry = "";
 		String level = SVRLMessage.levelToString(message.getErrorLevelInt());
 		entry += "Type: " + level.substring(0, 1).toUpperCase() +  "\n";
-		entry += "SystemID: " + instanceSN.getAbsPath() +  "\n";
+		entry += "SystemID: " + sourceFile.getAbsolutePath() +  "\n";
 		entry += "Line: " + location.getLineNumber() +  "\n";
 		entry += "Column: " + (location.getColumnNumber() - 1) +   "\n";
 		if(message.hasLink()){
@@ -138,18 +128,12 @@ public class SVRLReport {
 		}
 	}
 	
-	public NodeList getMessages(){
-		return this.messages;
-	}
-	public NodeList getFixes(){
-		return this.quickFixes;
-	}
 	
-	public TextSource getSchema(){
-		return this.schema;
-	}
-	public TextSource getInput(){
-		return this.input.getTextSource();
+//	public TextSource getInput(){
+//		return this.source.getTextSource();
+//	}
+	public File getSourceFile(){
+		return this.sourceFile;
 	}
 	
 	public _Report getReport(){

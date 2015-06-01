@@ -22,6 +22,7 @@ import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;
 import net.sqf.utils.process.log.DefaultProcessLoger;
 import net.sqf.utils.process.log.ProcessLoger;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -48,7 +49,7 @@ public class CommandlineTool {
 	private Scanner cmdInput = new Scanner(System.in);
 	
 	
-	public void start(File input, File schema, File outFile, File config) throws XPathExpressionException, IOException, SAXException, XMLStreamException, TransformerException, URISyntaxException, CancelException{
+	public void start(File input, File schema, File outFile, File config) throws XPathExpressionException, IOException, SAXException, XMLStreamException, XSLTErrorListener, URISyntaxException, CancelException{
 		this.input = input;
 		this.outFile = outFile;
 		this.escali = new Escali();
@@ -59,8 +60,8 @@ public class CommandlineTool {
 		
 	}
 	
-	private void validate() throws XPathExpressionException, FileNotFoundException, TransformerException, IOException, SAXException, URISyntaxException, XMLStreamException{
-		this.report = this.escali.validate(TextSource.readTextFile(this.input));
+	private void validate() throws XPathExpressionException, FileNotFoundException, XSLTErrorListener, IOException, SAXException, URISyntaxException, XMLStreamException{
+		this.report = this.escali.validate(TextSource.readTextFile(this.input), new DefaultProcessLoger());
 		System.out.println(printValidationReport());
 		System.out.println(Menus.firstMenu);
 		System.out.print("Type your selection: ");
@@ -80,26 +81,26 @@ public class CommandlineTool {
 		}
 	}
 	
-	private void fix() throws XPathExpressionException, TransformerConfigurationException, IOException{
-		NodeList fixNodes = this.report.getFixes();
-		for (int i = 0; i < fixNodes.getLength(); i++) {
-			System.out.println((i + 1) + "\t" + SVRLReport.XPR.getString("sqf:description/svrl:text", fixNodes.item(i)));
-		}
-		System.out.println("0\texit");
-		System.out.print("Choose the QuickFix: ");
-		int sel = Integer.parseInt(cmdInput.next()) - 1;
-		if(sel == - 1){
-			System.exit(0);
-		}
-		
-		Node fix = fixNodes.item(sel);
-		System.out.println("Id of the quickFix:");
+	private void fix() throws XPathExpressionException, IOException{
+//		NodeList fixNodes = this.report.getFixes();
+//		for (int i = 0; i < fixNodes.getLength(); i++) {
+//			System.out.println((i + 1) + "\t" + SVRLReport.XPR.getString("sqf:description/svrl:text", fixNodes.item(i)));
+//		}
+//		System.out.println("0\texit");
+//		System.out.print("Choose the QuickFix: ");
+//		int sel = Integer.parseInt(cmdInput.next()) - 1;
+//		if(sel == - 1){
+//			System.exit(0);
+//		}
+//		
+//		Node fix = fixNodes.item(sel);
+//		System.out.println("Id of the quickFix:");
 //		TextSource result = escali.executeFix(new String[]{SVRLReport.XPR.getString("@id", fix)});
 //		TextSource.write(this.outFile, result);
 	}
 	
-	private String printValidationReport() throws TransformerConfigurationException{
-		return escali.validateText().toString();
+	private String printValidationReport() {
+		return report.getFormatetReport(SVRLReport.TEXT_FORMAT).toString();
 	}
 	
 	

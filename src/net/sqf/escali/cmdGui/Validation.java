@@ -24,22 +24,23 @@ import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;
 import net.sqf.utils.process.log.DefaultProcessLoger;
 import net.sqf.utils.process.log.ProcessLoger;
+import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 
 public class Validation {
 	private Escali escali;
 	private Scanner cmdInput = new Scanner(System.in);
 	
-	public Validation(File schema, Config config, ProcessLoger logger) throws TransformerConfigurationException, IOException, CancelException{
+	public Validation(File schema, Config config, ProcessLoger logger) throws XSLTErrorListener, IOException, CancelException{
 		this.escali = new Escali(config, new EscaliArchiveResources());
 		this.escali.compileSchema(TextSource.readTextFile(schema), logger);
 	}
 	
-	public SVRLReport validate(File instance) throws IOException, XPathExpressionException, TransformerException, SAXException, URISyntaxException, XMLStreamException{
+	public SVRLReport validate(File instance) throws IOException, XPathExpressionException, XSLTErrorListener, SAXException, URISyntaxException, XMLStreamException{
 		TextSource textSource = TextSource.readTextFile(instance);
-		return this.escali.validate(textSource);
+		return this.escali.validate(textSource, new DefaultProcessLoger());
 	}
 	
-	public void executeFix(String fixId) throws TransformerConfigurationException, IOException {
+	public void executeFix(String fixId) throws XSLTErrorListener, IOException {
 		_Report reportObj = this.escali.getReport().getReport();
 		_ModelNode node = reportObj.getChildById(fixId);
 		_QuickFix[] fixes;
@@ -48,7 +49,7 @@ public class Validation {
 		} else {
 			fixes = new _QuickFix[]{};
 		}
-		escali.executeFix(fixes);
+//		escali.executeFix(fixes);
 	}
 	
 	public void interactive() {
