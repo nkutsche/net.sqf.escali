@@ -19,7 +19,7 @@
 
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:es="http://www.escali.schematron-quickfix.com/" xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:svrl="http://purl.oclc.org/dsdl/svrl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" exclude-result-prefixes="xs xd sch svrl" xmlns:sch="http://purl.oclc.org/dsdl/schematron" version="2.0">
-    <xsl:include href="escali_compiler_3_sqf-main_2.xsl"/>
+    <xsl:include href="escali_compiler_3_sqf-main.xsl"/>
 
 
     <xd:doc scope="stylesheet">
