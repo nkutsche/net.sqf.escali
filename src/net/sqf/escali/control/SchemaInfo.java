@@ -3,19 +3,17 @@ package net.sqf.escali.control;
 import java.io.IOException;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 import net.sqf.xmlUtils.staxParser.StringNode;
 import net.sqf.xmlUtils.xpath.XPathReader;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
+
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class SchemaInfo {
 	private XSLTPipe infoGenerator = new XSLTPipe("Schema anlayzer");

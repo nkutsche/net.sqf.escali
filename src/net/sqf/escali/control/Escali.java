@@ -1,19 +1,15 @@
 package net.sqf.escali.control;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
 import net.sqf.escali.control.report._QuickFix;
 import net.sqf.escali.resources.EscaliArchiveResources;
-import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;

@@ -5,16 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
-
-import org.xml.sax.SAXException;
 
 import net.sqf.escali.control.report._QuickFix;
 import net.sqf.escali.control.report._UserEntry;
-import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;
@@ -23,6 +17,8 @@ import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 import net.sqf.xmlUtils.xslt.Parameter;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
 import net.sqf.xsm.operations.PositionalReplace;
+
+import org.xml.sax.SAXException;
 
 public class Executor {
 	
@@ -45,10 +41,10 @@ public class Executor {
 				ueParams.add(new Parameter(entry.getId(), ProcessNamespaces.SQF_NS, entry.getValue()));
 			}
 		}
-		final ArrayList<TransformerException> exceptions = new ArrayList<TransformerException>();
 		XSLTPipe manipulator = new XSLTPipe("", new XSLTErrorListener());
 		ArrayList<Parameter> params = new ArrayList<Parameter>();
 		params.add(new Parameter("id", ids));
+		params.add(new Parameter("markChanges", !config.getChangePrefix().equals("")));
 		TextSource extractorXSL = extractor.pipe(svrl, params); 
 		manipulator.addStep(extractorXSL, ueParams);
 		TextSource extractorResult = manipulator.pipe(input, config.createManipulatorParams());

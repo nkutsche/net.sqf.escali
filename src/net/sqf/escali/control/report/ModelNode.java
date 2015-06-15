@@ -1,20 +1,23 @@
 package net.sqf.escali.control.report;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import javax.swing.Icon;
+
 import net.sqf.escali.control.SVRLReport;
+import net.sqf.view.utils.images.IconMap;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
 abstract class ModelNode implements _ModelNode {
-	private final URI icon;
+	private Icon icon;
 	private final String baseUri;
 	private boolean hasIcon = false;
 	private final URI link;
@@ -30,10 +33,17 @@ abstract class ModelNode implements _ModelNode {
 
 	ModelNode(Node node, int svrlIdx) throws DOMException, URISyntaxException {
 		this.svrlIdx = svrlIdx;
-		this.icon = new URI(SVRLReport.XPR.getAttributValue(node, "icon",
+		URI iconUri = new URI(SVRLReport.XPR.getAttributValue(node, "icon",
 				ProcessNamespaces.ES_NS));
-		if (!icon.equals(new URI("")))
+		Icon icon = null;
+		if (!iconUri.equals(new URI(""))){
+			try {
+				icon = IconMap.getIcon(iconUri);
+			} catch (IOException e) {
+			}
 			this.hasIcon = true;
+		}
+		this.icon = icon;
 		this.link = new URI(SVRLReport.XPR.getAttributValue(node, "link",
 				ProcessNamespaces.ES_NS));
 		if (!link.equals(new URI("")))
@@ -163,7 +173,7 @@ abstract class ModelNode implements _ModelNode {
 
 	// I C O N
 	@Override
-	public URI getIcon() {
+	public Icon getIcon() {
 		// TODO Auto-generated method stub
 		return this.icon;
 	}
@@ -172,6 +182,12 @@ abstract class ModelNode implements _ModelNode {
 	public boolean hasIcon() {
 		// TODO Auto-generated method stub
 		return this.hasIcon;
+	}
+	
+	@Override
+	public void setIcon(Icon icon) {
+		this.hasIcon = icon != null;
+		this.icon = icon;
 	}
 
 	// L I N K

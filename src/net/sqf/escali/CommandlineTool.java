@@ -8,33 +8,23 @@ import java.util.Scanner;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
 import net.sqf.escali.cmdGui.Menus;
 import net.sqf.escali.control.Escali;
-import net.sqf.escali.control.EscaliReceiver;
 import net.sqf.escali.control.SVRLReport;
-import net.sqf.escali.control.SchemaInfo;
-import net.sqf.escali.resources.EscaliFileResources;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;
 import net.sqf.utils.process.log.DefaultProcessLoger;
-import net.sqf.utils.process.log.ProcessLoger;
 import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class CommandlineTool {

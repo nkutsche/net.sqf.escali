@@ -4,15 +4,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerConfigurationException;
 
 import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.log.DefaultProcessLoger;
 import net.sqf.utils.process.log.ProcessLoger;
-import net.sqf.utils.process.log.ProcessStateListener;
-import net.sqf.utils.process.queues._Task;
-import net.sqf.utils.process.queues.listeners.QueueListener;
 import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 import net.sqf.xmlUtils.xslt.Parameter;
 import net.sqf.xmlUtils.xslt.XSLTPipe;
@@ -28,28 +24,6 @@ public class Validator {
 
 	private final EscaliRsourcesInterface resource;
 	
-	private ProcessStateListener psl = new ProcessStateListener() {
-		
-		@Override
-		public void start() {
-			
-		}
-		
-		@Override
-		public void setProcessState(double state, String message) {
-			System.out.println(state + "% -" + message);
-		}
-		
-		@Override
-		public void end(Exception e) {
-			e.printStackTrace();
-		}
-		
-		@Override
-		public void end() {
-			
-		}
-	};
 	
 	public Validator(EscaliRsourcesInterface resource) throws XSLTErrorListener, FileNotFoundException{
 		this.resource = resource;

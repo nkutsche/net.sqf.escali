@@ -2,7 +2,10 @@ package net.sqf.escali.control.report;
 
 import java.util.ArrayList;
 
-public interface _MessageGroup extends _ModelNode{
+import net.sqf.view.utils.lists.items._ListGroupNode;
+
+
+public interface _MessageGroup extends _ModelNode, _ListGroupNode{
 
 	public abstract int[] getLevelCounts();
 
@@ -15,5 +18,7 @@ public interface _MessageGroup extends _ModelNode{
 	public abstract double getErrorLevel();
 
 	public abstract double getMaxErrorLevel();
+
+	public abstract int getMaxErrorLevelInt();
 
 }

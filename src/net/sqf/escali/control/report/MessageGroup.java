@@ -89,6 +89,18 @@ public class MessageGroup extends ModelNode implements _MessageGroup {
 	}
 	
 	@Override
+	public int getMaxErrorLevelInt(){
+		ArrayList<_SVRLMessage> messages = getMessages();
+		int maxLevel = -1;
+		for (Iterator<_SVRLMessage> iterator = messages.iterator(); iterator
+				.hasNext();) {
+			int msgLevel = iterator.next().getErrorLevelInt();
+			maxLevel = msgLevel > maxLevel ? msgLevel : maxLevel;
+		}
+		return maxLevel;
+	}
+	
+	@Override
 	public double getErrorLevel() {
 		ArrayList<_SVRLMessage> messages = getMessages();
 		double sumWeight = 0.0;
@@ -99,5 +111,5 @@ public class MessageGroup extends ModelNode implements _MessageGroup {
 		}
 		return sumWeight / messages.size();
 	}
-
+	
 }
