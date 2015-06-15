@@ -3,7 +3,6 @@ package net.sqf.escali.control.report;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.xml.stream.Location;
 import javax.xml.xpath.XPathExpressionException;
 
 import net.sqf.xmlUtils.staxParser.NodeInfo;

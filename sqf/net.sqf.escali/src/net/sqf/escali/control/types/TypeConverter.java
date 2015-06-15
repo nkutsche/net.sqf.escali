@@ -2,19 +2,18 @@ package net.sqf.escali.control.types;
 
 import java.util.HashMap;
 
-import org.joda.time.DateTime;
-
 import net.sf.saxon.type.ValidationException;
-import net.sf.saxon.value.*;
+import net.sf.saxon.value.DateValue;
+import net.sf.saxon.value.TimeValue;
 
+@SuppressWarnings("rawtypes")
 public class TypeConverter {
 	private String type;
-	private Class objectClass = String.class;
 	public TypeConverter(String type) {
 		this.type = type;
 		
 	}
-	@SuppressWarnings("unchecked")
+
 	public Object convertValue(String value){
 		Object result;
 		if(value == null){
@@ -33,6 +32,7 @@ public class TypeConverter {
 		}
 		return result;
 	}
+	
 	
 	private Class getClass(String type){
 		if(typeVerifierMap.containsKey(type)){

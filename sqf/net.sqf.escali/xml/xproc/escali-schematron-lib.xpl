@@ -184,7 +184,7 @@
 
         <p:validate-with-xml-schema>
             <p:input port="schema">
-                <p:document href="../schema/SQF/schematron-schema.xsd"/>
+                <p:document href="../schema/SQF/iso-schematron.xsd"/>
             </p:input>
         </p:validate-with-xml-schema>
 

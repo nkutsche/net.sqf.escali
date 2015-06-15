@@ -3,7 +3,6 @@ package net.sqf.escali.control.report;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;

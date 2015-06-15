@@ -5,15 +5,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.xml.stream.Location;
 import javax.xml.xpath.XPathExpressionException;
 
 import net.sqf.escali.control.SVRLReport;
-import net.sqf.xmlUtils.parser.PositionalXMLHandler;
 import net.sqf.xmlUtils.staxParser.NodeInfo;
-import net.sqf.xmlUtils.staxParser.PositionalXMLReader;
 import net.sqf.xmlUtils.staxParser.StringNode;
-import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 import net.sqf.xmlUtils.xpath.XPathReader;
 
 import org.w3c.dom.DOMException;

@@ -1,22 +1,10 @@
 package net.sqf.escali.control;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-
-import net.sqf.escali.control.report.ModelNodeFac;
 import net.sqf.escali.control.report._Report;
 import net.sqf.escali.control.report._SVRLMessage;
 import net.sqf.escali.resources.EscaliRsourcesInterface;
@@ -26,21 +14,20 @@ import net.sqf.utils.process.log.DefaultProcessLoger;
 import net.sqf.xmlUtils.exceptions.ValidationException;
 import net.sqf.xmlUtils.exceptions.ValidationSummaryException;
 import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
-import net.sqf.xmlUtils.staxParser.StringNode;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 import net.sqf.xmlUtils.xsd.Xerces;
-import net.sqf.xmlUtils.xslt.Parameter;
+
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 public class SchematronBaseValidator {
 	private Xerces xerces;
-	private EscaliRsourcesInterface resource;
 	private Escali internEscali;
 
 	public SchematronBaseValidator(EscaliRsourcesInterface resource,
 			Config config) throws SAXNotRecognizedException,
 			SAXNotSupportedException, XSLTErrorListener,
 			IOException, CancelException {
-		this.resource = resource;
 		xerces = new Xerces(ProcessNamespaces.SCH_NS,
 				resource.getSchematronSchema());
 		this.internEscali = new Escali(config, resource, false);
@@ -86,6 +73,7 @@ public class SchematronBaseValidator {
 	
 	
 	private static class SVRLException extends ValidationException {
+		private static final long serialVersionUID = 5177247209030123257L;
 		private static int getLineNumber(_SVRLMessage msg){
 			try {
 				return msg.getLocationInIstance().getStart().getLineNumber();

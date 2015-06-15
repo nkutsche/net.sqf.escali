@@ -1,8 +1,11 @@
 package net.sqf.escali.control.report;
 
+import net.sqf.view.utils.lists.items._ListGroupNode;
 
 
-public interface _QuickFix extends _ModelNode {
+
+
+public interface _QuickFix extends _ModelNode, _ListGroupNode {
 	public static final int ROLE_MIX = 0;
 	public static final int ROLE_ADD = 1;
 	public static final int ROLE_DELETE = 2;

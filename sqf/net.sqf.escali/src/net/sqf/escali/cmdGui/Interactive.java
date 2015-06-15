@@ -7,11 +7,9 @@ public class Interactive {
 	
 	
 	private final SVRLReport report;
-	private Fixing fixing;
 
 	public Interactive(SVRLReport report){
 		this.report = report;
-		this.fixing = new Fixing(report);
 		
 	}
 

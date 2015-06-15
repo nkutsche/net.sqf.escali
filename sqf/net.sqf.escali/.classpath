@@ -15,5 +15,6 @@
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sqf.xsm"/>
 	<classpathentry kind="src" path="/net.sqf.utils.process"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sqf.view.utils"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

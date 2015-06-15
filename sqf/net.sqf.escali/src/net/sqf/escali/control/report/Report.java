@@ -10,9 +10,7 @@ import java.util.Iterator;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import net.sqf.escali.control.SVRLReport;
 import net.sqf.xmlUtils.staxParser.StringNode;
-import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 import net.sqf.xmlUtils.xpath.XPathReader;
 
 import org.w3c.dom.DOMException;

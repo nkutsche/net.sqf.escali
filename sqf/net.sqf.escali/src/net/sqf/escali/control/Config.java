@@ -7,16 +7,12 @@ import java.util.ArrayList;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
 
-import net.sqf.escali.resources.EscaliArchiveResources;
-import net.sqf.escali.resources.EscaliFileResources;
-import net.sqf.escali.resources.EscaliRsourcesInterface;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.xmlUtils.staxParser.StringNode;
 import net.sqf.xmlUtils.xpath.ProcessNamespaces;
 import net.sqf.xmlUtils.xpath.XPathReader;
 import net.sqf.xmlUtils.xslt.Parameter;
 
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class Config {
@@ -46,6 +42,8 @@ public class Config {
 		this.phase = phase.equals("") || phase.equals("#DEFAULT") ? null : phase.split("\\s");
 		
 		this.xmlSaveMode = xpr.getBoolean("/es:config/es:output/es:xml-save-mode = 'true'", doc.getDocument());
+		
+		this.changePrefix = xpr.getString("/es:config/es:output/es:changePrefix", doc.getDocument());
 	}
 	
 
@@ -75,6 +73,10 @@ public class Config {
 	}
 	public void setPhase(String[] phases){
 		this.phase = phases;
+	}
+	
+	public void setChangePrefix(String prefix){
+		this.changePrefix = prefix;
 	}
 
 	public void setLanguage(String language){

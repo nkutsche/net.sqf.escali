@@ -5,6 +5,7 @@
     <es:tempFolder>../temp/</es:tempFolder>
     <es:phase>#ALL</es:phase>
     <es:output>
+        <es:changePrefix>sqfc</es:changePrefix>
         <es:xml-save-mode>true</es:xml-save-mode>
         <es:xsm-processor>../../net.sqf.xsm/xsm/v0.1/</es:xsm-processor>
     </es:output>

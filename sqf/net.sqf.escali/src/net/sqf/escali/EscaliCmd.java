@@ -5,18 +5,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import net.sqf.escali.cmdGui.Fixing;
 import net.sqf.escali.cmdGui.Interactive;
 import net.sqf.escali.cmdGui.Validation;
 import net.sqf.escali.control.Config;
 import net.sqf.escali.control.ConfigFactory;
-import net.sqf.escali.control.EscaliReceiver;
 import net.sqf.escali.control.SVRLReport;
-import net.sqf.escali.control.SchemaInfo;
 import net.sqf.escali.resources.EscaliOptions;
 import net.sqf.stringUtils.TextSource;
 import net.sqf.utils.process.exceptions.CancelException;

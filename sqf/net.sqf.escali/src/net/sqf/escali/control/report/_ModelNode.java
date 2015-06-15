@@ -3,7 +3,9 @@ package net.sqf.escali.control.report;
 import java.net.URI;
 import java.util.ArrayList;
 
-public interface _ModelNode {
+import net.sqf.view.utils.lists.items._ListNode;
+
+public interface _ModelNode extends _ListNode {
 	void setId(String id);
 	String toString();
 	_ModelNode getParent();
@@ -17,9 +19,7 @@ public interface _ModelNode {
 	void addChild(ArrayList<_ModelNode> children);
 	int getIndex();
 	int getSvrlIndex();
-	URI getIcon();
 	URI getLink();
-	boolean hasIcon();
 	boolean hasLink();
 	String getName();
 	int getChildCount();

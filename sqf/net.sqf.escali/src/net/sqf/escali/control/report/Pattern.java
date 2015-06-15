@@ -4,21 +4,15 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 
-import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathExpressionException;
 
 import net.sqf.escali.control.SVRLReport;
 import net.sqf.xmlUtils.staxParser.StringNode;
-import net.sqf.xmlUtils.xpath.ProcessNamespaces;
-import net.sqf.xmlUtils.xpath.XPathReader;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.sun.org.apache.xpath.internal.NodeSet;
 
 public class Pattern extends MessageGroup implements _Pattern {
 	private String isA;

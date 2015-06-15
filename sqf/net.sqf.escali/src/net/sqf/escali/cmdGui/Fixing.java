@@ -2,22 +2,16 @@ package net.sqf.escali.cmdGui;
 
 import java.io.IOException;
 
-import javax.xml.transform.TransformerConfigurationException;
-
-import net.sqf.escali.control.Escali;
 import net.sqf.escali.control.SVRLReport;
-import net.sqf.escali.control.report._ModelNode;
-import net.sqf.escali.control.report._QuickFix;
-import net.sqf.escali.control.report._Report;
 import net.sqf.xmlUtils.exceptions.XSLTErrorListener;
 
 public class Fixing {
 
-	private Escali escali;
-	private final SVRLReport report;
+//	private Escali escali;
+//	private final SVRLReport report;
 	
 	public Fixing(SVRLReport report) {
-		this.report = report;
+//		this.report = report;
 	}
 	
 	public void executeFix(String fixId) throws XSLTErrorListener, IOException {
